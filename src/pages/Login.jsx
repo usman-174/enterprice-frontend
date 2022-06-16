@@ -58,7 +58,7 @@ export default function SignIn() {
       }
     } catch (error) {
       setError(error?.response.data.message);
-      console.log(error.message);
+      console.log(error?.message);
     }
     setLoading(false);
   };
