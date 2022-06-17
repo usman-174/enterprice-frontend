@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client';
 import axios from "axios"
 import App from './App';
 import reportWebVitals from './reportWebVitals';
-axios.defaults.baseURL=process.env.API||"https://enter-price-back.herokuapp.com/"
+axios.defaults.baseURL=process.env.API||"https://enter-price-back.herokuapp.com/api"
 axios.defaults.withCredentials=true
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
