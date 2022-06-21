@@ -18,7 +18,7 @@ import axios from "axios";
 import React from "react";
 
 
-const AddLicense = ({ departmentList, fetchLicenses }) => {
+const AddLicense = ({ departmentList, fetchLicenses ,loading,donors,suppliers}) => {
   const [isOpen, setIsOpen] = React.useState(false);
 
   const [name, setName] = React.useState("");
@@ -42,10 +42,8 @@ const AddLicense = ({ departmentList, fetchLicenses }) => {
   const [error, setError] = React.useState("");
 
   const [department, setDepartment] = React.useState("");
-  // console.log({ year });
   const handleChange = (event) => {
     setChecked(event.target.checked);
-    console.log(event.target.checked);
     if (event.target.checked) {
       setYear(new Date().getFullYear() + 1);
     } else {
@@ -114,7 +112,9 @@ const AddLicense = ({ departmentList, fetchLicenses }) => {
       <Button
         variant="contained"
         onClick={handleOpen}
-        sx={{ margin: { md: "20px 60px" } }}
+        disabled={loading}
+        size="small"
+        sx={{ margin: { md: "20px 40px" ,xs:"10px"} }}
       >
         Add License
       </Button>
@@ -264,19 +264,51 @@ const AddLicense = ({ departmentList, fetchLicenses }) => {
                 my: 1,
               }}
             >
-              <TextField
-                margin="normal"
-                required
-                value={donor}
-                onChange={(e) => setDonor(e.target.value)}
-                id="donor"
-                label="Donor "
-                sx={{ width: "40%" }}
-                name="donor"
-                autoComplete="donor"
-                autoFocus
-              />
-              <TextField
+              <FormControl sx={{ width: "40%" }}>
+                <InputLabel id="Donor-id">Donor </InputLabel>
+                <Select
+                  labelId="Donor-id"
+                  id="demo-simple-select"
+                  value={donor}
+                  label="Donor"
+                  onChange={(e) => setDonor(e.target.value)}
+                >{donors?.map(val=>
+                  <MenuItem key={val._id} value={val.name}>{val.name}</MenuItem>
+                
+                
+                )}
+
+                
+                </Select>
+              </FormControl>
+              <FormControl sx={{ width: "40%" }}>
+                <InputLabel id="Supplier-id">Supplier</InputLabel>
+                <Select
+                  labelId="Supplier-id"
+                  id="demo-simple-select"
+                  value={supplier}
+                  label="Supplier"
+                  onChange={(e) => setSupplier(e.target.value)}
+                >{suppliers?.map(val=>
+                  <MenuItem key={val._id} value={val.name}>{val.name}</MenuItem>
+                
+                
+                )}
+
+                 
+                </Select>
+              </FormControl>
+            </Box>
+             
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-evenly",
+                alignItems: "center",
+                my: 1,
+              }}
+            >
+               <TextField
                 margin="normal"
                 required
                 value={url}
@@ -286,27 +318,6 @@ const AddLicense = ({ departmentList, fetchLicenses }) => {
                 label="Url"
                 name="url"
                 autoComplete="url"
-                autoFocus
-              />
-            </Box>
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "space-evenly",
-                alignItems: "center",
-                my: 1,
-              }}
-            >
-              <TextField
-                margin="normal"
-                required
-                value={supplier}
-                onChange={(e) => setSupplier(e.target.value)}
-                id="supplier"
-                sx={{ width: "40%" }}
-                label="Supplier "
-                name="supplier"
-                autoComplete="supplier"
                 autoFocus
               />
               <TextField

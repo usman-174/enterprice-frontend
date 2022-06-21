@@ -1,26 +1,24 @@
 import { Box, TableContainer, TablePagination, TextField } from "@mui/material";
 import axios from "axios";
 import { useEffect, useState } from "react";
-import logo from "../../assests/logo.png";
 
 import Table from "@mui/material/Table";
+
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
-import moment from "moment";
+
+import logo from "../../assests/logo.png";
 import AlertDialog from "../../components/AlertDialog";
-import AddDepartment from "../../components/dashboard/AddDepartment";
-import UpdateDepartment from "../../components/dashboard/EditDepartment";
-const Departments = () => {
+
+const Donors = () => {
   const [loading, setLoading] = useState(true);
-  const [departments, setDepartments] = useState([]);
-
+  const [donors, setDonors] = useState([]);
   const [currentPage, setCurrentPage] = useState(0);
-
-
   const [searchQ, setSearchQ] = useState("");
   const [limit, setLimit] = useState(10);
+
   const handlePagination = (_, page) => {
     setCurrentPage(page);
   };
@@ -28,24 +26,13 @@ const Departments = () => {
   const handleLimitChange = (event) => {
     setLimit(event.target.value);
   };
-  const handleDeleteDepartments = async (id) => {
-    try {
-      console.log("Deleting Department");
-      const { data } = await axios.delete(`/departments/${id}`);
-      if (data?.success) {
-        fetchDepartments();
-      }
-    } catch (error) {
-      alert(error?.response.data.message);
-    }
-  };
-  const fetchDepartments = async () => {
+  const fetchDonors = async () => {
     try {
       setLoading(true);
-      const { data } = await axios.get("departments");
+      const { data } = await axios.get("donors");
 
-      if (data?.departments) {
-        setDepartments(data?.departments);
+      if (data?.donors) {
+        setDonors(data?.donors);
       }
       setLoading(false);
     } catch (error) {
@@ -53,53 +40,54 @@ const Departments = () => {
       setLoading(false);
     }
   };
- 
 
+  const handleDeleteDonor = async (id) => {
+    try {
+      const { data } = await axios.delete("suppliers/" + id);
+      if (data?.success) {
+        return fetchDonors();
+      }
+    } catch (error) {
+      alert("Failed to delete the Supplier");
+    }
+  };
   useEffect(() => {
-    fetchDepartments();
-    
+    fetchDonors();
+
     // eslint-disable-next-line
   }, []);
-  if (loading && !departments.length) {
+  if (loading && !donors.length) {
     return <img src={logo} alt="loading" className="loader" />;
   }
   return (
-    <Box sx={{ margin: "20px" }}>
+    <Box sx={{ margin: { md: "50px", xs: "20px" } }}>
       <Box sx={{ margin: "20px auto", textAlign: "center" }}>
-        {departments.length ? (
+        {donors.length ? (
           <TextField
             id="outlined-basic"
             value={searchQ}
             sx={{ width: { md: "40%", lg: "25%", xs: "80%" } }}
             onChange={(e) => setSearchQ(e.target.value)}
-            label="Search Departments"
+            label="Search Donors"
             variant="outlined"
             size="small"
           />
         ) : null}
       </Box>
-      <AddDepartment
-       
-        fetchDepartments={fetchDepartments}
-      />
       <TableContainer>
         <Table
           size="small"
           sx={{
             padding: "10px",
             margin: "auto",
-            width: "94%",
+
             textAlign: "center",
           }}
         >
           <TableHead>
             <TableRow>
-              <TableCell sx={{ fontWeight: "bold" }}>ID</TableCell>
-              <TableCell sx={{ fontWeight: "bold" }}>Name</TableCell>
-              <TableCell sx={{ fontWeight: "bold" }}>Direction</TableCell>
-
-              <TableCell sx={{ fontWeight: "bold" }}>Description</TableCell>
-              <TableCell sx={{ fontWeight: "bold" }}>CreatedAt</TableCell>
+              <TableCell sx={{ fontWeight: "bold" }}>id</TableCell>
+              <TableCell sx={{ fontWeight: "bold" }}>name</TableCell>
 
               <TableCell sx={{ fontWeight: "bold", textAlign: "center" }}>
                 Action
@@ -107,7 +95,7 @@ const Departments = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {departments
+            {donors
               .slice(0, limit)
               .filter((val) => {
                 const query = searchQ.trim().toLowerCase();
@@ -115,34 +103,20 @@ const Departments = () => {
 
                 if (query.length === "") {
                   returnValue = false;
-                } else if (
-                  val.name.toLowerCase().includes(query) ||
-                  val.description.toLowerCase().includes(query)
-                ) {
+                } else if (val.name.toLowerCase().includes(query)) {
                   returnValue = true;
                 }
                 return returnValue;
               })
               .map((row) => (
                 <TableRow key={row._id}>
-                  <TableCell>{row._id}</TableCell>
-
+                  <TableCell sx={{ width: "300px" }}>{row._id}</TableCell>
                   <TableCell>{row.name}</TableCell>
-                  <TableCell>{row?.direction || "N/A"}</TableCell>
-                  <TableCell>{row.description}</TableCell>
-                  <TableCell>
-                    {moment(row.createdAt).format("MM/DD/YYYY")}
-                  </TableCell>
 
                   <TableCell sx={{ textAlign: "center" }}>
                     <AlertDialog
-                      handleDelete={handleDeleteDepartments}
+                      handleDelete={handleDeleteDonor}
                       id={row._id}
-                    />
-                    <UpdateDepartment
-                      loading={loading}
-                      fetchDepartments={fetchDepartments}
-                      department={row}
                     />
                   </TableCell>
                 </TableRow>
@@ -154,7 +128,7 @@ const Departments = () => {
       <TablePagination
         component="div"
         sx={{ marginRight: "40px" }}
-        count={departments?.length}
+        count={donors?.length}
         onPageChange={handlePagination}
         onRowsPerPageChange={handleLimitChange}
         page={currentPage}
@@ -165,4 +139,4 @@ const Departments = () => {
   );
 };
 
-export default Departments;
+export default Donors;

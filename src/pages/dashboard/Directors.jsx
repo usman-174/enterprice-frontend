@@ -1,7 +1,9 @@
 import {
-  Box, TableContainer,
+  Box,
+  TableContainer,
   TablePagination,
-  TextField
+  TextField,
+  Typography
 } from "@mui/material";
 import axios from "axios";
 import { useEffect, useState } from "react";
@@ -15,17 +17,16 @@ import TableRow from "@mui/material/TableRow";
 
 import logo from "../../assests/logo.png";
 import AlertDialog from "../../components/AlertDialog";
-import AddUser from "../../components/dashboard/AddUser";
-import UpdateUser from "../../components/dashboard/EditUser";
+import AddDirector from "../../components/dashboard/AddDirector";
+import UpdateDirector from "../../components/dashboard/EditDirector";
 
-const Users = () => {
+const Directors = () => {
   const [loading, setLoading] = useState(true);
-  const [users, setUsers] = useState([]);
+  const [directors, setDirectors] = useState([]);
   const [currentPage, setCurrentPage] = useState(0);
   const [searchQ, setSearchQ] = useState("");
   const [limit, setLimit] = useState(10);
   const [departmentList, setDepartmentList] = useState([]);
-
   const handlePagination = (_, page) => {
     setCurrentPage(page);
   };
@@ -33,15 +34,13 @@ const Users = () => {
   const handleLimitChange = (event) => {
     setLimit(event.target.value);
   };
-  const fetchUsers = async () => {
+  const fetchDirectors = async () => {
     try {
       setLoading(true);
-      const { data } = await axios.get("auth/all");
+      const { data } = await axios.get("auth/all_directors");
 
-      if (data?.users) {
-        const res = data?.users.filter((user) => user.role !== "director")
-
-        setUsers(res);
+      if (data?.directors) {
+        setDirectors(data?.directors);
       }
       setLoading(false);
     } catch (error) {
@@ -63,24 +62,24 @@ const Users = () => {
     try {
       const { data } = await axios.delete("auth/" + id);
       if (data?.success) {
-        return fetchUsers();
+        return fetchDirectors();
       }
     } catch (error) {
       alert("Failed to delete the user");
     }
   };
   useEffect(() => {
-    fetchUsers();
+    fetchDirectors();
     fetchDepartments();
     // eslint-disable-next-line
   }, []);
-  if (loading && !users.length) {
+  if (loading && !directors.length) {
     return <img src={logo} alt="loading" className="loader" />;
   }
   return (
     <Box sx={{ margin: { md: "50px", xs: "20px" } }}>
       <Box sx={{ margin: "20px auto", textAlign: "center" }}>
-        {users.length ? (
+        {directors?.length ? (
           <TextField
             id="outlined-basic"
             value={searchQ}
@@ -92,7 +91,12 @@ const Users = () => {
           />
         ) : null}
       </Box>
-      <AddUser fetchUsers={fetchUsers} departmentList={departmentList} />
+      <AddDirector
+        fetchUsers={fetchDirectors}
+        departmentList={departmentList}
+        fetchDepartments={fetchDepartments}
+        setDepartmentList={setDepartmentList}
+      />
       <TableContainer>
         <Table
           size="small"
@@ -108,47 +112,58 @@ const Users = () => {
               <TableCell sx={{ fontWeight: "bold" }}>Email</TableCell>
               <TableCell sx={{ fontWeight: "bold" }}>Username</TableCell>
               <TableCell sx={{ fontWeight: "bold" }}>Role</TableCell>
-              <TableCell sx={{ fontWeight: "bold" }}>Status</TableCell>
-
-              <TableCell sx={{ fontWeight: "bold" }}>Department</TableCell>
+              <TableCell sx={{ fontWeight: "bold" }}>
+                Managing Departments
+              </TableCell>
               <TableCell sx={{ fontWeight: "bold", textAlign: "center" }}>
                 Action
               </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {users
-              .slice(0, limit)
-              .filter((val) => {
-                const query = searchQ.trim().toLowerCase();
-                let returnValue = false;
+            {directors
+            .filter((val) => {
+              const query = searchQ.trim().toLowerCase();
+              let returnValue = false;
 
-                if (query.length === "") {
-                  returnValue = false;
-                } else if (
-                  val.username.toLowerCase().includes(query) ||
-                  val.email.toLowerCase().includes(query) ||
-                  val.role.toLowerCase().includes(query) ||
-                  val.department.name.toLowerCase().includes(query)
-                ) {
-                  returnValue = true;
-                }
-                return returnValue;
-              })
+              if (query.length === "") {
+                returnValue = false;
+              } else if (
+                val.username.toLowerCase().includes(query) ||
+                val.email.toLowerCase().includes(query) ||
+                val.role.toLowerCase().includes(query) 
+              ) {
+                returnValue = true;
+              }
+              return returnValue;
+            })
+              .slice(0, limit)
+              
               .map((row) => (
                 <TableRow key={row._id}>
                   <TableCell>{row.email}</TableCell>
                   <TableCell>{row.username}</TableCell>
                   <TableCell>{row.role.toUpperCase()}</TableCell>
-                  <TableCell>{row?.seeOnly ? "Read Only" : "Read/Write"}</TableCell>
-                  
-                  <TableCell>{row.department?.name}</TableCell>
+                  <TableCell>
+                    {row.manageList?.map((list) => (
+                      <Typography
+                        varaint="small"
+                        key={list._id}
+                        component="small"
+                        sx={{ mx: 1, fontSize: "12px" }}
+                      >
+                        {list.name}
+                      </Typography>
+                    ))}
+                  </TableCell>
+
                   <TableCell sx={{ textAlign: "center" }}>
-                  <AlertDialog  handleDelete={handleDeleteUser} id={row._id} />
-                    <UpdateUser
+                    <AlertDialog handleDelete={handleDeleteUser} id={row._id} />
+                    <UpdateDirector
                       loading={loading}
                       departmentList={departmentList}
-                      fetchUsers={fetchUsers}
+                      fetchUsers={fetchDirectors}
+                     
                       user={row}
                     />
                   </TableCell>
@@ -161,7 +176,7 @@ const Users = () => {
       <TablePagination
         component="div"
         sx={{ marginRight: "40px" }}
-        count={users?.length}
+        count={directors?.length}
         onPageChange={handlePagination}
         onRowsPerPageChange={handleLimitChange}
         page={currentPage}
@@ -172,4 +187,4 @@ const Users = () => {
   );
 };
 
-export default Users;
+export default Directors;

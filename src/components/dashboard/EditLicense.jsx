@@ -17,8 +17,7 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import axios from "axios";
 import React, { useState } from "react";
 
-const UpdateLicense = ({ loading, fetchLicenses, license, departmentList }) => {
-  console.log(license?.url)
+const UpdateLicense = ({ loading, fetchLicenses, license, departmentList,donors,suppliers }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [description, setDescription] = React.useState(
     license?.description || ""
@@ -131,6 +130,7 @@ const UpdateLicense = ({ loading, fetchLicenses, license, departmentList }) => {
     <>
       <IconButton
         onClick={handleOpen}
+        disabled={loading}
         sx={{ margin: "5px" }}
         title="Update User"
         size="small"
@@ -281,19 +281,51 @@ const UpdateLicense = ({ loading, fetchLicenses, license, departmentList }) => {
                 my: 1,
               }}
             >
-              <TextField
-                margin="normal"
-                required
-                value={donor}
-                onChange={(e) => setDonor(e.target.value)}
-                id="donor"
-                label="Donor "
-                sx={{ width: "40%" }}
-                name="donor"
-                autoComplete="donor"
-                autoFocus
-              />
-              <TextField
+              <FormControl sx={{ width: "40%" }}>
+                <InputLabel id="Donor-id">Donor</InputLabel>
+                <Select
+                  labelId="Donor-id"
+                  id="demo-simple-select"
+                  value={donor}
+                  label="Donor"
+                  onChange={(e) => setDonor(e.target.value)}
+                >{donors?.map(val=>
+                  <MenuItem key={val._id} value={val.name}>{val.name}</MenuItem>
+                
+                
+                )}
+
+                
+                </Select>
+              </FormControl>
+              <FormControl sx={{ width: "40%" }}>
+                <InputLabel id="Supplier-id">Supplier</InputLabel>
+                <Select
+                  labelId="Supplier-id"
+                  id="demo-simple-select"
+                  value={supplier}
+                  label="Supplier"
+                  onChange={(e) => setSupplier(e.target.value)}
+                >{suppliers?.map(val=>
+                  <MenuItem key={val._id} value={val.name}>{val.name}</MenuItem>
+                
+                
+                )}
+
+                 
+                </Select>
+              </FormControl>
+            </Box>
+             
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-evenly",
+                alignItems: "center",
+                my: 1,
+              }}
+            >
+               <TextField
                 margin="normal"
                 required
                 value={url}
@@ -303,27 +335,6 @@ const UpdateLicense = ({ loading, fetchLicenses, license, departmentList }) => {
                 label="Url"
                 name="url"
                 autoComplete="url"
-                autoFocus
-              />
-            </Box>
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "space-evenly",
-                alignItems: "center",
-                my: 1,
-              }}
-            >
-              <TextField
-                margin="normal"
-                required
-                value={supplier}
-                onChange={(e) => setSupplier(e.target.value)}
-                id="supplier"
-                sx={{ width: "40%" }}
-                label="Supplier "
-                name="supplier"
-                autoComplete="supplier"
                 autoFocus
               />
               <TextField

@@ -13,13 +13,14 @@ import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useUser } from "../../Store";
 import logo from "../../assests/logo.png";
+import { Tooltip } from "@mui/material";
 const Navbar = () => {
   const [anchorElNav, setAnchorElNav] = useState(null);
   const { setUser, user } = useUser();
   const navigate = useNavigate();
   const logout = async () => {
     await axios.post("auth/logout");
-  
+
     window.location.reload();
   };
   useEffect(() => {
@@ -90,6 +91,20 @@ const Navbar = () => {
                 display: { xs: "block", md: "none" },
               }}
             >
+              {user ? (
+                <MenuItem onClick={handleCloseNavMenu}>
+                  <Typography
+                    sx={{
+                      textAlign: "center",
+                      color: "black",
+                      textDecoration: "none",
+                    }}
+                    onClick={handleCloseNavMenu}
+                  >
+                    {user?.email}
+                  </Typography>
+                </MenuItem>
+              ) : null}
               {user?.role === "user" ? (
                 <MenuItem
                   component={Link}
@@ -184,8 +199,26 @@ const Navbar = () => {
               flexGrow: 1,
               display: { xs: "none", md: "flex" },
               justifyContent: { md: "right" },
+              alignItems: "center",
             }}
           >
+            {user ? (
+              <Tooltip title={user?.role.toUpperCase()}>
+                <Typography
+                  variant="p"
+                  component="small"
+                  sx={{
+                    marginRight: 4,
+                    display: "block",
+                    color: "#FFF",
+                    fontSize: "17px",
+                  }}
+                  onClick={handleCloseNavMenu}
+                >
+                  {user.email}
+                </Typography>
+              </Tooltip>
+            ) : null}
             {user?.role === "user" ? (
               <Button
                 sx={{

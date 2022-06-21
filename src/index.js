@@ -1,11 +1,17 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import axios from "axios"
-import App from './App';
-import reportWebVitals from './reportWebVitals';
-axios.defaults.baseURL=process.env.API||"https://enter-price-back.herokuapp.com/api"
-axios.defaults.withCredentials=true
-const root = ReactDOM.createRoot(document.getElementById('root'));
+import React from "react";
+import ReactDOM from "react-dom/client";
+import axios from "axios";
+import App from "./App";
+import reportWebVitals from "./reportWebVitals";
+if (process.env.NODE_ENV === "production") {
+  axios.defaults.baseURL =
+    process.env.API || "https://enter-price-back.herokuapp.com/api";
+} else {
+  axios.defaults.baseURL = "http://localhost:8000/api";
+}
+console.log({mode:process.env.NODE_ENV});
+axios.defaults.withCredentials = true;
+const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
     <App />
@@ -16,4 +22,3 @@ root.render(
 // to log results (for example: reportWebVitals(console.log))
 // or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
 reportWebVitals();
- 

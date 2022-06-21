@@ -19,6 +19,11 @@ import Departments from "./pages/dashboard/Departments";
 import Licenses from "./pages/dashboard/Licenses";
 import Users from "./pages/dashboard/Users";
 import { useUser } from "./Store";
+import ForgotPassword from "./pages/ForgotPassword";
+import Directors from "./pages/dashboard/Directors";
+import Suppliers from "./pages/dashboard/Suppliers";
+import Donors from "./pages/dashboard/Donors";
+import ComingLicenses from "./pages/ComingLicenses";
 
 
 
@@ -62,8 +67,20 @@ function App() {
         />
         <Route
           exact
+          path="/coming_licenses"
+          element={
+            <UserProtectedRoute Element={ComingLicenses} loading={loading} user={user} Reverse={"/login"} />
+          }
+        />
+        <Route
+          exact
           path="/login"
           element={user ? <Navigate to="/" /> : <Login />}
+        />
+         <Route
+          exact
+          path="/forgot_password"
+          element={user ? <Navigate to="/" /> : <ForgotPassword />}
         />
 
         {/* ADMIN ROUTES */}
@@ -82,6 +99,12 @@ function App() {
           <Route path="users" element={<Users />} />
           <Route path="departments" element={<Departments />} />
           <Route path="licenses" element={<Licenses />} />
+          <Route path="directors" element={<Directors />} />
+          <Route path="suppliers" element={<Suppliers />} />
+          <Route path="donors" element={<Donors />} />
+
+
+
 
 
         </Route>
@@ -96,7 +119,7 @@ const UserProtectedRoute = ({ Element, Reverse,loading, user }) => {
 
     }
     if(user && !loading){
-      if (user?.role==="user") {
+      if (user?.role!=="admin") {
         return <Element />;
       }else{
         return <Navigate to={"/dashboard"} />;

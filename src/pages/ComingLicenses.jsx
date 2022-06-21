@@ -2,7 +2,6 @@ import Table from "@mui/material/Table";
 import axios from "axios";
 import moment from "moment";
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 import logo from "../assests/logo.png";
 
 import {
@@ -16,14 +15,16 @@ import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
-import AddLicense from "../components/dashboard/AddLicense";
 import UpdateLicense from "../components/dashboard/EditLicense";
 import { useUser } from "../Store";
-const Home = () => {
+import { Link } from "react-router-dom";
+const ComingLicenses = () => {
   const { user } = useUser();
+
   const [loading, setLoading] = useState(true);
   const [licenses, setLicenses] = useState([]);
   const [departmentList, setDepartmentList] = useState([]);
+
   const [suppliers, setSuppliers] = useState([]);
   const [donors, setDonors] = useState([]);
   const [currentPage, setCurrentPage] = useState(0);
@@ -55,7 +56,7 @@ const Home = () => {
 
       if (data?.licenses) {
         const datax = data?.licenses.filter(
-          (val) => val.year <= new Date().getFullYear()
+          (val) => val.year > new Date().getFullYear()
         );
         setLicenses(datax);
       }
@@ -67,6 +68,7 @@ const Home = () => {
       setLoading(false);
     }
   };
+
   const fetchDonors = async () => {
     try {
       const { data } = await axios.get("donors");
@@ -92,8 +94,8 @@ const Home = () => {
   useEffect(() => {
     fetchLicenses();
     fetchDepartments();
-    fetchDonors();
     fetchSupplier();
+    fetchDonors();
     // eslint-disable-next-line
   }, []);
   if (loading && !licenses.length) {
@@ -117,24 +119,19 @@ const Home = () => {
           />
         ) : null}
       </Box>
-
-     {user.role !=="director"? <AddLicense
-        fetchLicenses={fetchLicenses}
-        departmentList={departmentList}
-      />:null}
       <Typography
         variant="small"
         sx={{
           fontSize: "15px",
           display: { md: "inline", xs: "block" },
-          margin: { md: 0, xs: 2 },
+          margin: { md: "0 40px", xs: 2 },
           color: "#3D57DB",
           textDecoration: "none",
         }}
         component={Link}
-        to={"/coming_licenses"}
+        to={"/"}
       >
-        Show Future Licenses
+        Show this year licenses
       </Typography>
       {licenses.length ? (
         <>
@@ -199,7 +196,7 @@ const Home = () => {
                   <TableCell sx={{ fontWeight: "bold", textAlign: "center" }}>
                     Release Year
                   </TableCell>
-                  {!user.seeOnly && user.role !== "director" ? (
+                  {!user.seeOnly ? (
                     <TableCell sx={{ fontWeight: "bold", textAlign: "center" }}>
                       Action
                     </TableCell>
@@ -209,6 +206,7 @@ const Home = () => {
               <TableBody>
                 {licenses.length
                   ? licenses
+                      .slice(0, limit)
                       .filter((val) => {
                         const query = searchQ.trim().toLowerCase();
                         let returnValue = false;
@@ -225,9 +223,7 @@ const Home = () => {
                         }
                         return returnValue;
                       })
-                      ?.slice(0, limit)
-
-                      ?.map((row) => (
+                      .map((row) => (
                         <TableRow key={row._id}>
                           <TableCell sx={{ textAlign: "center" }}>
                             {row.name}
@@ -284,7 +280,7 @@ const Home = () => {
                           <TableCell sx={{ textAlign: "center" }}>
                             {row?.year}
                           </TableCell>
-                          {!user.seeOnly && user.role !== "director"  ? (
+                          {!user.seeOnly ? (
                             <TableCell sx={{ textAlign: "center" }}>
                               <UpdateLicense
                                 departmentList={departmentList}
@@ -302,7 +298,6 @@ const Home = () => {
               </TableBody>
             </Table>
           </TableContainer>
-
           <TablePagination
             component="div"
             sx={{ marginRight: "40px" }}
@@ -312,10 +307,14 @@ const Home = () => {
             page={currentPage}
             rowsPerPage={limit}
             rowsPerPageOptions={[5, 10, 25]}
-          />
+          />{" "}
         </>
       ) : (
-        <Typography variant="h4" component="div" sx={{color:"red", mx: "auto", my: 6,textAlign:"center" }}>
+        <Typography
+          variant="h4"
+          component="div"
+          sx={{ color: "red", mx: "auto", my: 3, textAlign: "center" }}
+        >
           No Licenses Found.
         </Typography>
       )}
@@ -323,4 +322,4 @@ const Home = () => {
   );
 };
 
-export default Home;
+export default ComingLicenses;

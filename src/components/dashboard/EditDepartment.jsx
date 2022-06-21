@@ -26,6 +26,7 @@ const UpdateDepartment = ({  loading,fetchDepartments ,department}) => {
   const [open, setOpen] = React.useState(false);
   const [description, setDescription] = React.useState(department?.description || "");
   const [name, setName] = React.useState(department?.name || "");
+  const [direction, setDirection] = React.useState(department?.direction||"");
 
   const [error, setError] = React.useState("");
 
@@ -42,6 +43,9 @@ const UpdateDepartment = ({  loading,fetchDepartments ,department}) => {
     }
     if (description && description !== department.description) {
       fields.description = description;
+    }
+    if (direction && direction !== department.direction) {
+      fields.direction = direction;
     }
     try {
       const { data } = await axios.put(`departments/${department._id}`, fields);
@@ -100,6 +104,18 @@ const UpdateDepartment = ({  loading,fetchDepartments ,department}) => {
               autoComplete="name"
               autoFocus
             />
+             <TextField
+                margin="normal"
+                required
+                fullWidth
+                value={direction}
+                onChange={(e) => setDirection(e.target.value)}
+                id="direction"
+                label="Direction"
+                name="direction"
+           
+                autoFocus
+              />
             <TextField
               margin="normal"
               required

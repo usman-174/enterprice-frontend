@@ -1,11 +1,8 @@
 import {
-  Box,
-  IconButton,
-  TableContainer,
+  Box, TableContainer,
   TablePagination,
-  TextField,
+  TextField
 } from "@mui/material";
-import DeleteIcon from "@mui/icons-material/Delete";
 
 import Table from "@mui/material/Table";
 import axios from "axios";
@@ -17,6 +14,7 @@ import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
+import AlertDialog from "../../components/AlertDialog";
 import AddLicense from "../../components/dashboard/AddLicense";
 import UpdateLicense from "../../components/dashboard/EditLicense";
 
@@ -24,6 +22,8 @@ const Licenses = () => {
   const [loading, setLoading] = useState(true);
   const [licenses, setLicenses] = useState([]);
   const [departmentList, setDepartmentList] = useState([]);
+  const [suppliers, setSuppliers] = useState([]);
+  const [donors, setDonors] = useState([]);
   const [currentPage, setCurrentPage] = useState(0);
   const [searchQ, setSearchQ] = useState("");
   const [limit, setLimit] = useState(10);
@@ -69,9 +69,33 @@ const Licenses = () => {
       return;
     }
   };
+  const fetchDonors = async () => {
+    try {
+      const { data } = await axios.get("donors");
+
+      if (data?.donors) {
+        setDonors(data?.donors);
+      }
+    } catch (error) {
+      console.log(error?.response.data.message);
+    }
+  };
+  const fetchSupplier = async () => {
+    try {
+      const { data } = await axios.get("suppliers");
+
+      if (data?.suppliers) {
+        setSuppliers(data?.suppliers);
+      }
+    } catch (error) {
+      console.log(error?.response.data.message);
+    }
+  };
   useEffect(() => {
     fetchLicenses();
     fetchDepartments();
+    fetchSupplier()
+    fetchDonors()
     // eslint-disable-next-line
   }, []);
   if (loading && !licenses.length) {
@@ -95,6 +119,9 @@ const Licenses = () => {
       <AddLicense
         fetchLicenses={fetchLicenses}
         departmentList={departmentList}
+        donors={donors}
+        suppliers={suppliers}
+        loading={loading}
       />
       <TableContainer>
         <Table
@@ -240,22 +267,16 @@ const Licenses = () => {
                       </TableCell>
 
                       <TableCell sx={{ textAlign: "center" }}>
-                        <IconButton
-                          title="Delete User"
-                          size="small"
-                          onClick={() => handleDelete(row._id)}
+                    <AlertDialog  handleDelete={handleDelete} id={row._id} />
 
-                          aria-label="delete"
-                        >
-                          <DeleteIcon
-                            color="error"
-                          />
-                        </IconButton>
+                       
                         <UpdateLicense
                           departmentList={departmentList}
                           license={row}
                           fetchLicenses={fetchLicenses}
                           loading={loading}
+                          donors={donors}
+                          suppliers={suppliers}
                         />
                       </TableCell>
                     </TableRow>

@@ -34,9 +34,9 @@ const Dashboard = () => {
             margin: "5px 20px",
             backgroundColor: "#f2f232",
             color: "#3D57DB",
-            '&:hover': {
+            "&:hover": {
               color: "#FFFF00",
-           },
+            },
             fontSize: "22px",
           }}
           // color="warning"
@@ -46,13 +46,16 @@ const Dashboard = () => {
           Users
         </Button>
         <Button
-          sx={{ margin: "5px 20px", backgroundColor: "#f2f232",
-          color: "#3D57DB",
-          '&:hover': {
-            color: "#FFFF00",
-         }, fontSize: "22px" }}
+          sx={{
+            margin: "5px 20px",
+            backgroundColor: "#f2f232",
+            color: "#3D57DB",
+            "&:hover": {
+              color: "#FFFF00",
+            },
+            fontSize: "22px",
+          }}
           variant="contained"
-        
           component={Link}
           to={"departments"}
         >
@@ -60,16 +63,67 @@ const Dashboard = () => {
         </Button>
         <Button
           variant="contained"
-          
-          sx={{ margin: "5px 20px", backgroundColor: "#f2f232",
-          color: "#3D57DB",
-          '&:hover': {
-            color: "#FFFF00",
-         }, fontSize: "22px" }}
+          sx={{
+            margin: "5px 20px",
+            backgroundColor: "#f2f232",
+            color: "#3D57DB",
+            "&:hover": {
+              color: "#FFFF00",
+            },
+            fontSize: "22px",
+          }}
           component={Link}
           to={"licenses"}
         >
           Licenses
+        </Button>
+        <Button
+          variant="contained"
+          sx={{
+            margin: "5px 20px",
+            backgroundColor: "#f2f232",
+            color: "#3D57DB",
+            "&:hover": {
+              color: "#FFFF00",
+            },
+            fontSize: "22px",
+          }}
+          component={Link}
+          to={"directors"}
+        >
+          Directors
+        </Button>
+        <Button
+          variant="contained"
+          sx={{
+            margin: "5px 20px",
+            backgroundColor: "#f2f232",
+            color: "#3D57DB",
+            "&:hover": {
+              color: "#FFFF00",
+            },
+            fontSize: "22px",
+          }}
+          component={Link}
+          to={"suppliers"}
+        >
+          Suppliers
+        </Button>
+        <Button
+          variant="contained"
+          sx={{
+            margin: "5px 20px",
+            backgroundColor: "#f2f232",
+            color: "#3D57DB",
+            "&:hover": {
+              color: "#FFFF00",
+            },
+            fontSize: "22px",
+          }}
+          component={Link}
+          to={"donors"}
+        >
+          Donors
         </Button>
       </Box>
       <br />

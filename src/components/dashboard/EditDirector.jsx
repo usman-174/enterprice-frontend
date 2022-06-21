@@ -1,26 +1,25 @@
-import BorderColorIcon from '@mui/icons-material/BorderColor';
+import BorderColorIcon from "@mui/icons-material/BorderColor";
 import {
-  Checkbox,
   FormControl,
-  FormControlLabel,
   FormHelperText,
   IconButton,
   InputLabel,
   MenuItem,
-  Select
+  Select,
+  Typography,
 } from "@mui/material";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Modal from "@mui/material/Modal";
 import TextField from "@mui/material/TextField";
 import axios from "axios";
-import React from "react";
+import React, { useEffect } from "react";
 const style = {
   position: "absolute",
   top: "50%",
   left: "50%",
   transform: "translate(-50%, -50%)",
-  width: {md : "35%",xs:"90%"},
+  width: { md: "35%", xs: "90%" },
 
   borderRadius: 2,
   bgcolor: "background.paper",
@@ -29,26 +28,33 @@ const style = {
   p: 4,
 };
 
-const UpdateUser = ({ user, loading, fetchUsers, departmentList }) => {
+const UpdateDirector = ({ user, loading, fetchUsers, departmentList }) => {
   const [open, setOpen] = React.useState(false);
   const [email, setEmail] = React.useState(user?.email || "");
   const [username, setUsername] = React.useState(user?.username || "");
 
-  const [role, setRole] = React.useState(user?.role || "");
   const [error, setError] = React.useState("");
+  const [manageList, setManageList] = React.useState(user?.manageList || []);
+  const [departments, setDepartments] = React.useState([]);
 
-  const [department, setDepartment] = React.useState(
-    user?.department?._id || ""
-  );
-  const [checked, setChecked] = React.useState(user?.seeOnly || false);
-  const handleChange = (event) => {
-    setChecked(event.target.checked);
-    
+  const handleDepartmentChange = (ex) => {
+    setManageList((e) => {
+      const data = [...e, ex.target.value];
+      return data;
+    });
+    setDepartments((e) => {
+      const data = e.filter((val) => val._id !== ex.target.value._id);
+      return data;
+    });
   };
-  const handleDepartmentChange = (e) => {
-    setDepartment(e.target.value);
+  const removeManageDepartment = (val) => {
+    setManageList((e) => e.filter((x) => x._id !== val._id));
+    setDepartments((e) => {
+      if (!e.find((dept) => dept._id === val._id)) {
+        return [...e, val];
+      }
+    });
   };
-
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
   const handleSubmit = async (e) => {
@@ -58,20 +64,15 @@ const UpdateUser = ({ user, loading, fetchUsers, departmentList }) => {
     if (email && email !== user.email) {
       fields.email = email;
     }
-    if (role && role !== user.role) {
-      fields.role = role;
-    }
-    if (department && department !== user.department) {
-      fields.department = department;
-    }
+
     if (username && username !== user.username) {
       fields.username = username;
     }
-    if (checked && checked !== user.seeOnly) {
-      fields.seeOnly = checked;
-    }
     try {
-      const { data } = await axios.put(`auth/${user._id}`, fields);
+      const { data } = await axios.put(`auth/${user._id}`, {
+        ...fields,
+        manageList,
+      });
       if (data?.success) {
         fetchUsers();
         if (!loading) {
@@ -83,11 +84,31 @@ const UpdateUser = ({ user, loading, fetchUsers, departmentList }) => {
       return setError(error?.response.data.message);
     }
   };
+  useEffect(() => {
+    const filteredDepartments = [];
+    departmentList.forEach((dept1) => {
+      const found = manageList.find((dept2) => dept2._id === dept1._id);
+      console.log({found});
+      if (!found) filteredDepartments.push(dept1);
+    });
+    console.log({
+      filteredDepartments,
+      departmentList,
+      manageList: user.manageList,
+    });
+    setDepartments(filteredDepartments);
+    // eslint-disable-next-line
+  }, []);
   return (
     <>
-     
-      <IconButton   onClick={handleOpen}sx={{margin:"5px"}} title="Update User" size="small" aria-label="delete">
-        <BorderColorIcon sx={{color:"#3D57DB"}} />
+      <IconButton
+        onClick={handleOpen}
+        sx={{ margin: "5px" }}
+        title="Update User"
+        size="small"
+        aria-label="delete"
+      >
+        <BorderColorIcon sx={{ color: "#3D57DB" }} />
       </IconButton>
       <Modal
         open={open}
@@ -139,51 +160,53 @@ const UpdateUser = ({ user, loading, fetchUsers, departmentList }) => {
               autoFocus
             />
             <FormControl sx={{ width: "60%", mt: 2 }}>
-              <InputLabel id="Department-id">Department</InputLabel>
+              <InputLabel id="Department-id">Manage Departments</InputLabel>
               <Select
                 labelId="Department-id"
                 id="demo-simple-select"
-                value={department}
+                value={""}
                 label="Department"
+                disabled={!departments.length}
                 onChange={handleDepartmentChange}
               >
-                {departmentList?.map((val) => {
+                {departments?.map((val) => {
                   return (
-                    <MenuItem key={val._id + val.name} value={val._id}>
+                    <MenuItem key={val._id + val.name} value={val}>
                       {val.name.toUpperCase()}
                     </MenuItem>
                   );
                 })}
               </Select>
-            </FormControl>
-
-            <FormControl sx={{ width: "60%", mt: 2 }}>
-              <InputLabel id="Role-id">Role</InputLabel>
-              <Select
-                labelId="Role-id"
-                id="demo-simple-selectx"
-                value={role}
-                label="Role"
-                onChange={(e) => setRole(e.target.value)}
+              <Typography
+                variant="p"
+                component="div"
+                sx={{ my: 2, display: "flex" }}
               >
-                <MenuItem selected value="admin">
-                  Admin
-                </MenuItem>
-                <MenuItem value="user">User</MenuItem>
-              </Select>
+                {manageList.map((val) => (
+                  <Typography
+                    varaint="small"
+                    key={val._id}
+                    onClick={() => removeManageDepartment(val)}
+                    component="small"
+                    sx={{
+                      mx: 2,
+                      fontSize: "12px",
+                      p: 1.15,
+                      borderRadius: 5,
+                      background: "yellow",
+                      cursor: "pointer",
+                      "&:hover": {
+                        background: "red",
+                        p: 1.157,
+                        textDecoration: "line-through",
+                      },
+                    }}
+                  >
+                    {val.name}
+                  </Typography>
+                ))}
+              </Typography>
             </FormControl>
-            <Box sx={{mx:1}}>
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={checked}
-                    onChange={handleChange}
-                    inputProps={{ "aria-label": "controlled" }}
-                  />
-                }
-                label="View Only"
-              />
-            </Box>
             <br />
             <Button
               type="submit"
@@ -200,4 +223,4 @@ const UpdateUser = ({ user, loading, fetchUsers, departmentList }) => {
   );
 };
 
-export default UpdateUser;
+export default UpdateDirector;

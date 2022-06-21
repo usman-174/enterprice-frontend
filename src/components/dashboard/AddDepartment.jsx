@@ -23,6 +23,8 @@ import React from "react";
   const AddDepartment = ({  fetchDepartments }) => {
     const [open, setOpen] = React.useState(false);
     const [title, setTitle] = React.useState("");
+    const [direction, setDirection] = React.useState("");
+
     const [description, setDescription] = React.useState("");
     const [error, setError] = React.useState("");
   
@@ -33,14 +35,14 @@ import React from "react";
     const handleSubmit = async (e) => {
       setError("");
       e.preventDefault();
-      if (!title || !description ) {
+      if (!title || !description ||!direction) {
         return setError("Please provide all details");
       }
 
       try {
         const { data } = await axios.post("departments/", {
           name:title,
-          description,
+          description,direction
           
         });
         if (data?.success) {
@@ -94,6 +96,18 @@ import React from "react";
                 id="title"
                 label="Title"
                 name="title"
+           
+                autoFocus
+              />
+              <TextField
+                margin="normal"
+                required
+                fullWidth
+                value={direction}
+                onChange={(e) => setDirection(e.target.value)}
+                id="direction"
+                label="Direction"
+                name="direction"
            
                 autoFocus
               />
