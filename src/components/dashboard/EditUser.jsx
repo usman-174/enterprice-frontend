@@ -53,6 +53,14 @@ const UpdateUser = ({ user, loading, fetchUsers, departmentList }) => {
   const handleClose = () => setOpen(false);
   const handleSubmit = async (e) => {
     setError("");
+    if(email === user.email &&
+      role === user.role&&
+      department === user.department._id&&
+       username === user.username&&
+      checked === user.seeOnly){
+        setError("Please change a field.");
+
+      }
     e.preventDefault();
     let fields = {};
     if (email && email !== user.email) {
@@ -61,15 +69,18 @@ const UpdateUser = ({ user, loading, fetchUsers, departmentList }) => {
     if (role && role !== user.role) {
       fields.role = role;
     }
-    if (department && department !== user.department) {
+    if (department && department !== user.department._id) {
       fields.department = department;
     }
     if (username && username !== user.username) {
       fields.username = username;
     }
-    if (checked && checked !== user.seeOnly) {
+     
+    if (checked !== user.seeOnly) {
       fields.seeOnly = checked;
     }
+     
+    console.log(fields);
     try {
       const { data } = await axios.put(`auth/${user._id}`, fields);
       if (data?.success) {

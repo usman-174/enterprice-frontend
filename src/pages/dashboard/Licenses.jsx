@@ -179,6 +179,9 @@ const Licenses = () => {
                 Supplier Contact
               </TableCell>
               <TableCell sx={{ fontWeight: "bold", textAlign: "center" }}>
+                Url
+              </TableCell>
+              <TableCell sx={{ fontWeight: "bold", textAlign: "center" }}>
                 Fund Type
               </TableCell>
              
@@ -256,6 +259,10 @@ const Licenses = () => {
                       </TableCell>
                       <TableCell sx={{ textAlign: "center" }}>
                         {row?.supplierContact ? row.supplierContact  : "N/A"}
+
+                      </TableCell>
+                      <TableCell sx={{ textAlign: "center" }}>
+                        {row?.url ? row.url  : "N/A"}
 
                       </TableCell>
                       <TableCell sx={{ textAlign: "center" }}>

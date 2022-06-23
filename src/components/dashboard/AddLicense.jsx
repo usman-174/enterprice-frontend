@@ -6,7 +6,7 @@ import {
   FormHelperText,
   InputLabel,
   MenuItem,
-  Select
+  Select,
 } from "@mui/material";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -17,8 +17,13 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import axios from "axios";
 import React from "react";
 
-
-const AddLicense = ({ departmentList, fetchLicenses ,loading,donors,suppliers}) => {
+const AddLicense = ({
+  departmentList,
+  fetchLicenses,
+  loading,
+  donors,
+  suppliers,
+}) => {
   const [isOpen, setIsOpen] = React.useState(false);
 
   const [name, setName] = React.useState("");
@@ -50,7 +55,6 @@ const AddLicense = ({ departmentList, fetchLicenses ,loading,donors,suppliers}) 
       setYear(new Date().getFullYear());
     }
   };
-  
 
   const handleOpen = () => setIsOpen(true);
   const handleClose = () => setIsOpen(false);
@@ -65,6 +69,7 @@ const AddLicense = ({ departmentList, fetchLicenses ,loading,donors,suppliers}) 
       !sourceOfFund ||
       !type ||
       !sku ||
+      !url ||
       !validityTime ||
       !supportTime ||
       !amount ||
@@ -76,7 +81,7 @@ const AddLicense = ({ departmentList, fetchLicenses ,loading,donors,suppliers}) 
     ) {
       return setError("Please provide all details");
     }
-
+    // return
     try {
       const { data } = await axios.post("licenses", {
         type,
@@ -92,7 +97,7 @@ const AddLicense = ({ departmentList, fetchLicenses ,loading,donors,suppliers}) 
         amount,
         sourceOfFund,
         department,
-        donor,
+        donor: sourceOfFund === "own" ? undefined : donor,
         supplier,
         supplierContact,
         lempirasPrice,
@@ -114,13 +119,18 @@ const AddLicense = ({ departmentList, fetchLicenses ,loading,donors,suppliers}) 
         onClick={handleOpen}
         disabled={loading}
         size="small"
-        sx={{ margin: { md: "20px 40px" ,xs:"10px"} }}
+        sx={{ margin: { md: "20px 40px", xs: "10px" } }}
       >
         Add License
       </Button>
       <Drawer anchor={"right"} open={isOpen} onClose={() => setIsOpen(false)}>
         <Box
-          sx={{ width: { md: 500, xs: "98%" }, p: 2, mt: { md: 5, xs: 2 },mx:"auto" }}
+          sx={{
+            width: { md: 500, xs: "98%" },
+            p: 2,
+            mt: { md: 5, xs: 2 },
+            mx: "auto",
+          }}
         >
           {error && (
             <FormHelperText
@@ -188,23 +198,21 @@ const AddLicense = ({ departmentList, fetchLicenses ,loading,donors,suppliers}) 
                 display: "flex",
                 justifyContent: "space-around",
                 AlignItems: "center",
-                
               }}
             >
-
-            <TextField
-              margin="normal"
-              required
-              type="number"
-              value={amount}
-              sx={{ width: "40%" }}
-              onChange={(e) => setAmount(e.target.value)}
-              id="amount"
-              label="Amount"
-              name="amount"
-              autoComplete="amount"
-              autoFocus
-            />
+              <TextField
+                margin="normal"
+                required
+                type="number"
+                value={amount}
+                sx={{ width: "40%" }}
+                onChange={(e) => setAmount(e.target.value)}
+                id="amount"
+                label="Amount"
+                name="amount"
+                autoComplete="amount"
+                autoFocus
+              />
               <TextField
                 margin="normal"
                 required
@@ -257,83 +265,6 @@ const AddLicense = ({ departmentList, fetchLicenses ,loading,donors,suppliers}) 
               />
             </Box>
             <Box
-              sx={{
-                display: "flex",
-                justifyContent: "space-evenly",
-                alignItems: "center",
-                my: 1,
-              }}
-            >
-              <FormControl sx={{ width: "40%" }}>
-                <InputLabel id="Donor-id">Donor </InputLabel>
-                <Select
-                  labelId="Donor-id"
-                  id="demo-simple-select"
-                  value={donor}
-                  label="Donor"
-                  onChange={(e) => setDonor(e.target.value)}
-                >{donors?.map(val=>
-                  <MenuItem key={val._id} value={val.name}>{val.name}</MenuItem>
-                
-                
-                )}
-
-                
-                </Select>
-              </FormControl>
-              <FormControl sx={{ width: "40%" }}>
-                <InputLabel id="Supplier-id">Supplier</InputLabel>
-                <Select
-                  labelId="Supplier-id"
-                  id="demo-simple-select"
-                  value={supplier}
-                  label="Supplier"
-                  onChange={(e) => setSupplier(e.target.value)}
-                >{suppliers?.map(val=>
-                  <MenuItem key={val._id} value={val.name}>{val.name}</MenuItem>
-                
-                
-                )}
-
-                 
-                </Select>
-              </FormControl>
-            </Box>
-             
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "space-evenly",
-                alignItems: "center",
-                my: 1,
-              }}
-            >
-               <TextField
-                margin="normal"
-                required
-                value={url}
-                sx={{ width: "40%" }}
-                onChange={(e) => setUrl(e.target.value)}
-                id="url"
-                label="Url"
-                name="url"
-                autoComplete="url"
-                autoFocus
-              />
-              <TextField
-                margin="normal"
-                required
-                value={supplierContact}
-                sx={{ width: "40%" }}
-                onChange={(e) => setSupplierContact(e.target.value)}
-                id="supplierContact"
-                label="Supplier Contact"
-                name="supplierContact"
-                autoComplete="supplierContact"
-                autoFocus
-              />
-            </Box>
-            <Box
               component="div"
               sx={{
                 display: "flex",
@@ -377,6 +308,64 @@ const AddLicense = ({ departmentList, fetchLicenses ,loading,donors,suppliers}) 
                 </Select>
               </FormControl>
             </Box>
+
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-evenly",
+                alignItems: "center",
+                my: 1,
+              }}
+            >
+              {sourceOfFund === "donation" ? (
+                <FormControl sx={{ width: "40%" }}>
+                  <InputLabel id="Donor-id">Donor </InputLabel>
+                  <Select
+                    labelId="Donor-id"
+                    id="demo-simple-select"
+                    value={donor}
+                    label="Donor"
+                    onChange={(e) => setDonor(e.target.value)}
+                  >
+                    {donors?.map((val) => (
+                      <MenuItem key={val._id} value={val.name}>
+                        {val.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              ) : null}
+              <FormControl
+                sx={{ width: sourceOfFund === "donation" ? "40%" : "80%" }}
+              >
+                <InputLabel id="Supplier-id">Supplier</InputLabel>
+                <Select
+                  labelId="Supplier-id"
+                  id="demo-simple-select"
+                  value={supplier}
+                  label="Supplier"
+                  onChange={(e) => {
+                    setSupplier(e.target.value);
+                  }}
+                >
+                  {suppliers?.map((val) => (
+                    <MenuItem
+                      key={val._id}
+                      onClick={() => {
+                        console.log("Setting url and contact");
+                        setUrl(val?.url || "URl" + val._id);
+                        setSupplierContact(val?.contact || "Contact" + val._id);
+                      }}
+                      value={val.name}
+                    >
+                      {val.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Box>
+
+        
             <Box
               component="div"
               display={"flex"}

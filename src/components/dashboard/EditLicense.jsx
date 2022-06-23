@@ -27,7 +27,7 @@ const UpdateLicense = ({ loading, fetchLicenses, license, departmentList,donors,
   );
 
   const [name, setName] = React.useState(license?.name || "");
-  const [firstDate, setFirstDate] = React.useState(license?.firstDate || "");
+  const [firstDate, setFirstDate] = React.useState(license?.firstDate || Date.now());
 
   const [amount, setAmount] = React.useState(license?.amount || 0);
   const [supportTime, setSupportTime] = React.useState(
@@ -273,83 +273,7 @@ const UpdateLicense = ({ loading, fetchLicenses, license, departmentList,donors,
                 autoFocus
               />
             </Box>
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "space-evenly",
-                alignItems: "center",
-                my: 1,
-              }}
-            >
-              <FormControl sx={{ width: "40%" }}>
-                <InputLabel id="Donor-id">Donor</InputLabel>
-                <Select
-                  labelId="Donor-id"
-                  id="demo-simple-select"
-                  value={donor}
-                  label="Donor"
-                  onChange={(e) => setDonor(e.target.value)}
-                >{donors?.map(val=>
-                  <MenuItem key={val._id} value={val.name}>{val.name}</MenuItem>
-                
-                
-                )}
-
-                
-                </Select>
-              </FormControl>
-              <FormControl sx={{ width: "40%" }}>
-                <InputLabel id="Supplier-id">Supplier</InputLabel>
-                <Select
-                  labelId="Supplier-id"
-                  id="demo-simple-select"
-                  value={supplier}
-                  label="Supplier"
-                  onChange={(e) => setSupplier(e.target.value)}
-                >{suppliers?.map(val=>
-                  <MenuItem key={val._id} value={val.name}>{val.name}</MenuItem>
-                
-                
-                )}
-
-                 
-                </Select>
-              </FormControl>
-            </Box>
-             
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "space-evenly",
-                alignItems: "center",
-                my: 1,
-              }}
-            >
-               <TextField
-                margin="normal"
-                required
-                value={url}
-                sx={{ width: "40%" }}
-                onChange={(e) => setUrl(e.target.value)}
-                id="url"
-                label="Url"
-                name="url"
-                autoComplete="url"
-                autoFocus
-              />
-              <TextField
-                margin="normal"
-                required
-                value={supplierContact}
-                sx={{ width: "40%" }}
-                onChange={(e) => setSupplierContact(e.target.value)}
-                id="supplierContact"
-                label="Supplier Contact"
-                name="supplierContact"
-                autoComplete="supplierContact"
-                autoFocus
-              />
-            </Box>
+         
             <Box
               component="div"
               sx={{
@@ -391,6 +315,62 @@ const UpdateLicense = ({ loading, fetchLicenses, license, departmentList,donors,
                     Own
                   </MenuItem>
                   <MenuItem value="donation">Donation</MenuItem>
+                </Select>
+              </FormControl>
+            </Box>
+           
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-evenly",
+                alignItems: "center",
+                my: 1,
+              }}
+            >
+              {sourceOfFund === "donation" ? (
+                <FormControl sx={{ width: "40%" }}>
+                  <InputLabel id="Donor-id">Donor </InputLabel>
+                  <Select
+                    labelId="Donor-id"
+                    id="demo-simple-select"
+                    value={donor}
+                    label="Donor"
+                    onChange={(e) => setDonor(e.target.value)}
+                  >
+                    {donors?.map((val) => (
+                      <MenuItem key={val._id} value={val.name}>
+                        {val.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              ) : null}
+              <FormControl
+                sx={{ width: sourceOfFund === "donation" ? "40%" : "80%" }}
+              >
+                <InputLabel id="Supplier-id">Supplier</InputLabel>
+                <Select
+                  labelId="Supplier-id"
+                  id="demo-simple-select"
+                  value={supplier}
+                  label="Supplier"
+                  onChange={(e) => {
+                    setSupplier(e.target.value);
+                  }}
+                >
+                  {suppliers?.map((val) => (
+                    <MenuItem
+                      key={val._id}
+                      onClick={() => {
+                        console.log("Setting url and contact");
+                        setUrl(val?.url || "URl" + val._id);
+                        setSupplierContact(val?.contact || "Contact" + val._id);
+                      }}
+                      value={val.name}
+                    >
+                      {val.name}
+                    </MenuItem>
+                  ))}
                 </Select>
               </FormControl>
             </Box>
@@ -437,7 +417,7 @@ const UpdateLicense = ({ loading, fetchLicenses, license, departmentList,donors,
                     label="First Date"
                     inputFormat="MM/dd/yyyy"
                     value={firstDate}
-                    minDate={Date.now()}
+                    // minDate={Date.now()}
                     disabled={license?.year > new Date().getFullYear()}
                     onChange={(e) => setFirstDate(e)}
                     renderInput={(params) => <TextField {...params} />}

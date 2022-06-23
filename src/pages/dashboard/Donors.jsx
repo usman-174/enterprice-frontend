@@ -11,6 +11,8 @@ import TableRow from "@mui/material/TableRow";
 
 import logo from "../../assests/logo.png";
 import AlertDialog from "../../components/AlertDialog";
+import EditDonor from "../../components/dashboard/EditDonors"
+import AddDonor from "../../components/dashboard/AddDonor";
 
 const Donors = () => {
   const [loading, setLoading] = useState(true);
@@ -74,6 +76,7 @@ const Donors = () => {
           />
         ) : null}
       </Box>
+      <AddDonor fetchDonors={fetchDonors} />
       <TableContainer>
         <Table
           size="small"
@@ -110,7 +113,7 @@ const Donors = () => {
               })
               .map((row) => (
                 <TableRow key={row._id}>
-                  <TableCell sx={{ width: "300px" }}>{row._id}</TableCell>
+                  <TableCell >{row._id}</TableCell>
                   <TableCell>{row.name}</TableCell>
 
                   <TableCell sx={{ textAlign: "center" }}>
@@ -118,6 +121,7 @@ const Donors = () => {
                       handleDelete={handleDeleteDonor}
                       id={row._id}
                     />
+                    <EditDonor fetchDonors={fetchDonors} donor={row} loading={loading} />
                   </TableCell>
                 </TableRow>
               ))}

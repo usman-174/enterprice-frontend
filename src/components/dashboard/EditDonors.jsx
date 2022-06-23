@@ -1,8 +1,6 @@
-import {
-    FormHelperText, IconButton
-} from "@mui/material";
+import { FormHelperText, IconButton } from "@mui/material";
 import Box from "@mui/material/Box";
-import BorderColorIcon from '@mui/icons-material/BorderColor';
+import BorderColorIcon from "@mui/icons-material/BorderColor";
 
 import Button from "@mui/material/Button";
 import Modal from "@mui/material/Modal";
@@ -14,7 +12,7 @@ const style = {
   top: "50%",
   left: "50%",
   transform: "translate(-50%, -50%)",
-  width: {md : "35%",xs:"90%"},
+  width: { md: "35%", xs: "90%" },
   borderRadius: 2,
   bgcolor: "background.paper",
   border: "1px solid crimson",
@@ -22,49 +20,48 @@ const style = {
   p: 4,
 };
 
-const UpdateDepartment = ({  loading,fetchDepartments ,department}) => {
+const EditDonor = ({ loading, fetchDonors, donor }) => {
   const [open, setOpen] = React.useState(false);
-  const [description, setDescription] = React.useState(department?.description || "");
-  const [name, setName] = React.useState(department?.name || "");
-  const [direction, setDirection] = React.useState(department?.direction||"");
+  const [name, setName] = React.useState(donor?.name || "");
 
   const [error, setError] = React.useState("");
-
- 
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
   const handleSubmit = async (e) => {
     setError("");
+    if (name === donor.name) {
+      setError("Please change a field.");
+    }
     e.preventDefault();
     let fields = {};
-    if (name && name !== department.name) {
+    if (name && name !== donor.name) {
       fields.name = name;
     }
-    if (description && description !== department.description) {
-      fields.description = description;
-    }
-    if (direction && direction !== department.direction) {
-      fields.direction = direction;
-    }
+
     try {
-      const { data } = await axios.put(`departments/${department._id}`, fields);
+      const { data } = await axios.put(`donors/${donor._id}`, fields);
       if (data?.success) {
-        fetchDepartments();
-        if(!loading){
-            return handleClose();
-          }
+        fetchDonors();
+        if (!loading) {
+          return handleClose();
+        }
       }
     } catch (error) {
-        console.log(error.message);
+      console.log(error.message);
       return setError(error?.response.data.message);
     }
   };
   return (
     <>
-     
-      <IconButton onClick={handleOpen} sx={{margin:"5px"}} title="Update User" size="small" aria-label="delete">
-        <BorderColorIcon  sx={{color:"#3D57DB"}} />
+      <IconButton
+        sx={{ margin: "5px" }}
+        title="Update User"
+        size="small"
+        aria-label="delete"
+        onClick={handleOpen}
+      >
+        <BorderColorIcon  sx={{ color: "#3D57DB" }} />
       </IconButton>
       <Modal
         open={open}
@@ -91,7 +88,6 @@ const UpdateDepartment = ({  loading,fetchDepartments ,department}) => {
             noValidate
             sx={{ mt: 1 }}
           >
-           
             <TextField
               margin="normal"
               required
@@ -104,32 +100,6 @@ const UpdateDepartment = ({  loading,fetchDepartments ,department}) => {
               autoComplete="name"
               autoFocus
             />
-             <TextField
-                margin="normal"
-                required
-                fullWidth
-                value={direction}
-                onChange={(e) => setDirection(e.target.value)}
-                id="direction"
-                label="Direction"
-                name="direction"
-           
-                autoFocus
-              />
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              multiline
-              value={description}
-              minRows={5}
-              onChange={(e) => setDescription(e.target.value)}
-              id="description"
-              label="Description"
-              name="description"
-              autoComplete="description"
-              autoFocus
-            />
           
             <Button
               type="submit"
@@ -137,7 +107,7 @@ const UpdateDepartment = ({  loading,fetchDepartments ,department}) => {
               variant="contained"
               sx={{ margin: "20px auto", textAlign: "center" }}
             >
-            {loading ? "Updating..." :" Update Department"}
+              {loading ? "Updating..." : " Update Donor"}
             </Button>
           </Box>
         </Box>
@@ -146,4 +116,4 @@ const UpdateDepartment = ({  loading,fetchDepartments ,department}) => {
   );
 };
 
-export default UpdateDepartment;
+export default EditDonor;

@@ -26,7 +26,12 @@ const style = {
   p: 4,
 };
 
-const AddDirector = ({ departmentList, setDepartmentList, fetchUsers,fetchDepartments }) => {
+const AddDirector = ({
+  departmentList,
+  setDepartmentList,
+  fetchUsers,
+  fetchDepartments,
+}) => {
   const [open, setOpen] = React.useState(false);
   const [email, setEmail] = React.useState("");
   const [username, setUsername] = React.useState("");
@@ -34,7 +39,7 @@ const AddDirector = ({ departmentList, setDepartmentList, fetchUsers,fetchDepart
 
   const [error, setError] = React.useState("");
 
-  // const [department, setDepartment] = React.useState("");
+
   const handleDepartmentChange = (ex) => {
     setManageList((e) => {
       const data = [...e, ex.target.value];
@@ -43,6 +48,15 @@ const AddDirector = ({ departmentList, setDepartmentList, fetchUsers,fetchDepart
     setDepartmentList((e) => {
       const data = e.filter((val) => val._id !== ex.target.value._id);
       return data;
+    });
+    
+  };
+  const removeManageDepartment = (val) => {
+    setManageList((e) => e.filter((x) => x._id !== val._id));
+    setDepartmentList((e) => {
+      if (!e.find((dept) => dept._id === val._id)) {
+        return [...e, val];
+      }
     });
   };
 
@@ -59,12 +73,12 @@ const AddDirector = ({ departmentList, setDepartmentList, fetchUsers,fetchDepart
       const { data } = await axios.post("auth/add_director", {
         email,
         username,
-        manageList:manageList.map(list=>list._id),
+        manageList: manageList.map((list) => list._id),
       });
       if (data?.success) {
-        e.target.reset()
+        e.target.reset();
         fetchUsers();
-        fetchDepartments()
+        fetchDepartments();
         return handleClose();
       }
     } catch (error) {
@@ -153,12 +167,30 @@ const AddDirector = ({ departmentList, setDepartmentList, fetchUsers,fetchDepart
                 variant="p"
                 component="div"
                 sx={{ my: 2, display: "flex" }}
-              >{
-                manageList.map(val=>
-                  <Typography varaint="small"  key={val._id} component="small" sx={{ mx: 2,fontSize:"12px" }}>
+              >
+                {manageList.map((val) => (
+                  <Typography
+                    varaint="small"
+                    key={val._id}
+                    onClick={() => removeManageDepartment(val)}
+                    component="small"
+                    sx={{
+                      mx: 2,
+                      fontSize: "12px",
+                      p: 1.15,
+                      borderRadius: 5,
+                      background: "yellow",
+                      cursor: "pointer",
+                      "&:hover": {
+                        background: "red",
+                        p: 1.157,
+                        textDecoration: "line-through",
+                      },
+                    }}
+                  >
                     {val.name}
-                  </Typography>)
-              }
+                  </Typography>
+                ))}
               </Typography>
             </FormControl>
             <br />

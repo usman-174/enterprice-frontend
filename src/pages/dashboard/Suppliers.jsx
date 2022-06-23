@@ -11,7 +11,8 @@ import TableRow from "@mui/material/TableRow";
 
 import logo from "../../assests/logo.png";
 import AlertDialog from "../../components/AlertDialog";
-
+import AddSupplier from "../../components/dashboard/AddSupplier";
+import EditSupplier from "../../components/dashboard/EditSuppliers";
 const Suppliers = () => {
   const [loading, setLoading] = useState(true);
   const [suppliers, setSuppliers] = useState([]);
@@ -26,7 +27,7 @@ const Suppliers = () => {
   const handleLimitChange = (event) => {
     setLimit(event.target.value);
   };
-  const fetchSupplier = async () => {
+  const fetchSuppliers = async () => {
     try {
       setLoading(true);
       const { data } = await axios.get("suppliers");
@@ -45,14 +46,14 @@ const Suppliers = () => {
     try {
       const { data } = await axios.delete("suppliers/" + id);
       if (data?.success) {
-        return fetchSupplier();
+        return fetchSuppliers();
       }
     } catch (error) {
       alert("Failed to delete the Supplier");
     }
   };
   useEffect(() => {
-    fetchSupplier();
+    fetchSuppliers();
 
     // eslint-disable-next-line
   }, []);
@@ -74,6 +75,7 @@ const Suppliers = () => {
           />
         ) : null}
       </Box>
+      <AddSupplier fetchSuppliers={fetchSuppliers} />
       <TableContainer>
         <Table
           size="small"
@@ -86,8 +88,10 @@ const Suppliers = () => {
         >
           <TableHead>
             <TableRow>
-              <TableCell sx={{ fontWeight: "bold" }}>id</TableCell>
-              <TableCell sx={{ fontWeight: "bold" }}>name</TableCell>
+              <TableCell sx={{ fontWeight: "bold" }}>Id</TableCell>
+              <TableCell sx={{ fontWeight: "bold" }}>Name</TableCell>
+              <TableCell sx={{ fontWeight: "bold" }}>Contact</TableCell>
+              <TableCell sx={{ fontWeight: "bold" }}>Url</TableCell>
 
               <TableCell sx={{ fontWeight: "bold", textAlign: "center" }}>
                 Action
@@ -112,11 +116,18 @@ const Suppliers = () => {
                 <TableRow key={row._id}>
                   <TableCell>{row._id}</TableCell>
                   <TableCell>{row.name}</TableCell>
+                  <TableCell>{row.contact ? row.contact : "N/A"}</TableCell>
+                  <TableCell>{row.url ? row.url : "N/A"}</TableCell>
 
                   <TableCell sx={{ textAlign: "center" }}>
                     <AlertDialog
                       handleDelete={handleDeleteSupplier}
                       id={row._id}
+                    />
+                    <EditSupplier
+                      fetchSuppliers={fetchSuppliers}
+                      supplier={row}
+                      loading={loading}
                     />
                   </TableCell>
                 </TableRow>
