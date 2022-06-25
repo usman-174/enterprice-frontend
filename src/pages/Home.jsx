@@ -7,6 +7,10 @@ import logo from "../assests/logo.png";
 
 import {
   Box,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
   TableContainer,
   TablePagination,
   TextField,
@@ -23,7 +27,10 @@ const Home = () => {
   const { user } = useUser();
   const [loading, setLoading] = useState(true);
   const [licenses, setLicenses] = useState([]);
+  const [AllLicenses, setAllLicenses] = useState([]);
+
   const [departmentList, setDepartmentList] = useState([]);
+  const [departmentFilter, setDepartmentFilter] = useState();
   const [suppliers, setSuppliers] = useState([]);
   const [donors, setDonors] = useState([]);
   const [currentPage, setCurrentPage] = useState(0);
@@ -36,6 +43,17 @@ const Home = () => {
 
   const handleLimitChange = (event) => {
     setLimit(event.target.value);
+  };
+  const handleDepartmentFilter = (event) => {
+    setDepartmentFilter(event.target.value);
+    if (event.target.value === "All Departments") {
+      setLicenses(AllLicenses);
+    } else {
+      const data = AllLicenses.filter(
+        (license) => license.department._id === event.target.value._id
+      );
+      setLicenses(data);
+    }
   };
   const fetchDepartments = async () => {
     try {
@@ -54,10 +72,11 @@ const Home = () => {
       const { data } = await axios.get("licenses");
 
       if (data?.licenses) {
-        const datax = data?.licenses.filter(
+        const thisYearLicenses = data?.licenses.filter(
           (val) => val.year <= new Date().getFullYear()
         );
-        setLicenses(datax);
+        setAllLicenses(thisYearLicenses);
+        setLicenses(thisYearLicenses);
       }
       setLoading(false);
     } catch (error) {
@@ -118,24 +137,59 @@ const Home = () => {
         ) : null}
       </Box>
 
-     {user.role !=="director"? <AddLicense
-        fetchLicenses={fetchLicenses}
-        departmentList={departmentList}
-      />:null}
-      <Typography
-        variant="small"
+      {user.role !== "director" ? (
+        <AddLicense
+          fetchLicenses={fetchLicenses}
+          departmentList={departmentList}
+        />
+      ) : null}
+      <Box
         sx={{
-          fontSize: "15px",
-          display: { md: "inline", xs: "block" },
-          margin: { md: 0, xs: 2 },
-          color: "#3D57DB",
-          textDecoration: "none",
+          display: "flex",
+          justifyContent: { md: "left", xs: "center" },
+          alignItems: "center",
+          flexDirection: { md: "row", xs: "column" },
         }}
-        component={Link}
-        to={"/coming_licenses"}
       >
-        Show Future Licenses
-      </Typography>
+        <Typography
+          variant="small"
+          sx={{
+            fontSize: "15px",
+            display: { md: "inline", xs: "block" },
+            margin: { md: 0, xs: 2 },
+            color: "#3D57DB",
+            textDecoration: "none",
+          }}
+          component={Link}
+          to={"/coming_licenses"}
+        >
+          Show Future Licenses
+        </Typography>
+        {user?.role === "director" ? (
+          <FormControl
+            size="small"
+            sx={{ width: { md: "20%", xs: "75%" }, mx: 2 }}
+          >
+            <InputLabel id="demo-simple2-select-label">Department</InputLabel>
+            <Select
+              labelId="demo-simple2-select-label"
+              id="demo-simple2-select"
+              value={departmentFilter}
+              defaultValue="All Departments"
+              label="Department"
+              onChange={handleDepartmentFilter}
+            >
+              <MenuItem value="All Departments">All Departments</MenuItem>
+              {departmentList?.map((dept) => (
+                <MenuItem key={dept._id} value={dept}>
+                  {dept.name}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        ) : null}
+      </Box>
+
       {licenses.length ? (
         <>
           <TableContainer>
@@ -191,6 +245,9 @@ const Home = () => {
                   </TableCell>
                   <TableCell sx={{ fontWeight: "bold", textAlign: "center" }}>
                     Supplier Contact
+                  </TableCell>
+                  <TableCell sx={{ fontWeight: "bold", textAlign: "center" }}>
+                    Url
                   </TableCell>
                   <TableCell sx={{ fontWeight: "bold", textAlign: "center" }}>
                     Fund Type
@@ -279,12 +336,15 @@ const Home = () => {
                             {row?.supplierContact ? row.supplierContact : "N/A"}
                           </TableCell>
                           <TableCell sx={{ textAlign: "center" }}>
+                            {row?.url ? row.url : "N/A"}
+                          </TableCell>
+                          <TableCell sx={{ textAlign: "center" }}>
                             {row?.sourceOfFund ? row.sourceOfFund : "N/A"}
                           </TableCell>
                           <TableCell sx={{ textAlign: "center" }}>
                             {row?.year}
                           </TableCell>
-                          {!user.seeOnly && user.role !== "director"  ? (
+                          {!user.seeOnly && user.role !== "director" ? (
                             <TableCell sx={{ textAlign: "center" }}>
                               <UpdateLicense
                                 departmentList={departmentList}
@@ -315,7 +375,11 @@ const Home = () => {
           />
         </>
       ) : (
-        <Typography variant="h4" component="div" sx={{color:"red", mx: "auto", my: 6,textAlign:"center" }}>
+        <Typography
+          variant="h4"
+          component="div"
+          sx={{ color: "red", mx: "auto", my: 6, textAlign: "center" }}
+        >
           No Licenses Found.
         </Typography>
       )}

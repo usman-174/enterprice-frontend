@@ -57,13 +57,15 @@ const { state } = useLocation();
           } else {
             navigate(`/`);
           }
+      setLoading(false);
+
         }
       }
     } catch (error) {
       setError(error?.response.data.message);
       console.log(error?.message);
+      setLoading(false);
     }
-    setLoading(false);
   };
   return (
     <Container component="main" maxWidth="xs">

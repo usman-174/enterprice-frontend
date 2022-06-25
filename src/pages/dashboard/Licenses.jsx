@@ -1,7 +1,11 @@
 import {
-  Box, TableContainer,
+  Box,
+  Checkbox,
+  FormControlLabel,
+  FormGroup,
+  TableContainer,
   TablePagination,
-  TextField
+  TextField,
 } from "@mui/material";
 
 import Table from "@mui/material/Table";
@@ -21,12 +25,15 @@ import UpdateLicense from "../../components/dashboard/EditLicense";
 const Licenses = () => {
   const [loading, setLoading] = useState(true);
   const [licenses, setLicenses] = useState([]);
+  const [AllLicenses, setAllLicenses] = useState([]);
+
   const [departmentList, setDepartmentList] = useState([]);
   const [suppliers, setSuppliers] = useState([]);
   const [donors, setDonors] = useState([]);
   const [currentPage, setCurrentPage] = useState(0);
   const [searchQ, setSearchQ] = useState("");
   const [limit, setLimit] = useState(10);
+  const [showFutureLicenses, setShowFutureLicenses] = useState(false);
   const handlePagination = (_, page) => {
     setCurrentPage(page);
   };
@@ -40,8 +47,17 @@ const Licenses = () => {
       const { data } = await axios.get("licenses/all");
 
       if (data?.licenses) {
+        setAllLicenses(data?.licenses);
+        if (!showFutureLicenses) {
+          setLicenses(
+            data?.licenses.filter((val) => val.year <= new Date().getFullYear())
+          );
+        } else {
+          setLicenses(
+            data?.licenses.filter((val) => val.year > new Date().getFullYear())
+          );
+        }
         setLicenses(data?.licenses);
-      
       }
       setLoading(false);
     } catch (error) {
@@ -92,10 +108,23 @@ const Licenses = () => {
     }
   };
   useEffect(() => {
+    if (AllLicenses.length) {
+      if (!showFutureLicenses) {
+        setLicenses(
+          AllLicenses.filter((val) => val.year <= new Date().getFullYear())
+        );
+      } else {
+        setLicenses(
+          AllLicenses.filter((val) => val.year > new Date().getFullYear())
+        );
+      }
+    }
+  }, [setShowFutureLicenses,AllLicenses,showFutureLicenses]);
+  useEffect(() => {
     fetchLicenses();
     fetchDepartments();
-    fetchSupplier()
-    fetchDonors()
+    fetchSupplier();
+    fetchDonors();
     // eslint-disable-next-line
   }, []);
   if (loading && !licenses.length) {
@@ -123,14 +152,24 @@ const Licenses = () => {
         suppliers={suppliers}
         loading={loading}
       />
-      <TableContainer>
+      <FormGroup sx={{ml:5}}>
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={showFutureLicenses}
+              onChange={(e) => setShowFutureLicenses(e.target.checked)}
+            />
+          }
+          label="Show Future Licenses"
+        />
+      </FormGroup>
+      <TableContainer >
         <Table
           size="small"
           sx={{
             padding: "10px",
             margin: "auto",
-            width: "94%",
-           
+
             textAlign: "center",
           }}
         >
@@ -184,9 +223,9 @@ const Licenses = () => {
               <TableCell sx={{ fontWeight: "bold", textAlign: "center" }}>
                 Fund Type
               </TableCell>
-             
+
               <TableCell sx={{ fontWeight: "bold", textAlign: "center" }}>
-               Release Year
+                Release Year
               </TableCell>
               <TableCell sx={{ fontWeight: "bold", textAlign: "center" }}>
                 Action
@@ -235,48 +274,48 @@ const Licenses = () => {
                         {row.validityTime} years
                       </TableCell>
                       <TableCell sx={{ textAlign: "center" }}>
-                        {row.firstDate ? row.daysTillValidityExpiry + " days" : "N/A"  }
+                        {row.firstDate
+                          ? row.daysTillValidityExpiry + " days"
+                          : "N/A"}
                       </TableCell>
 
                       <TableCell sx={{ textAlign: "center" }}>
                         {row.supportTime} years
                       </TableCell>
                       <TableCell sx={{ textAlign: "center" }}>
-                        {row.firstDate ? row.daysTillSupportExpiry+ " days" : "N/A"}   
+                        {row.firstDate
+                          ? row.daysTillSupportExpiry + " days"
+                          : "N/A"}
                       </TableCell>
 
                       <TableCell sx={{ textAlign: "center" }}>
-                        {row.firstDate ?moment(row.firstDate).format("MM/DD/YYYY"): "N/A"}
-                        
+                        {row.firstDate
+                          ? moment(row.firstDate).format("MM/DD/YYYY")
+                          : "N/A"}
                       </TableCell>
                       <TableCell sx={{ textAlign: "center" }}>
-                        {row?.donor ? row.donor  : "N/A"}
+                        {row?.donor ? row.donor : "N/A"}
                       </TableCell>
-                     
-                      <TableCell sx={{ textAlign: "center" }}>
-                        {row?.supplier ? row.supplier  : "N/A"}
 
+                      <TableCell sx={{ textAlign: "center" }}>
+                        {row?.supplier ? row.supplier : "N/A"}
                       </TableCell>
                       <TableCell sx={{ textAlign: "center" }}>
-                        {row?.supplierContact ? row.supplierContact  : "N/A"}
-
+                        {row?.supplierContact ? row.supplierContact : "N/A"}
                       </TableCell>
                       <TableCell sx={{ textAlign: "center" }}>
-                        {row?.url ? row.url  : "N/A"}
-
+                        {row?.url ? row.url : "N/A"}
                       </TableCell>
                       <TableCell sx={{ textAlign: "center" }}>
-                        {row?.sourceOfFund ? row.sourceOfFund  : "N/A"}
-
+                        {row?.sourceOfFund ? row.sourceOfFund : "N/A"}
                       </TableCell>
                       <TableCell sx={{ textAlign: "center" }}>
                         {row?.year}
                       </TableCell>
 
                       <TableCell sx={{ textAlign: "center" }}>
-                    <AlertDialog  handleDelete={handleDelete} id={row._id} />
+                        <AlertDialog handleDelete={handleDelete} id={row._id} />
 
-                       
                         <UpdateLicense
                           departmentList={departmentList}
                           license={row}

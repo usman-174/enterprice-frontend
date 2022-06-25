@@ -1,29 +1,35 @@
 import Table from "@mui/material/Table";
 import axios from "axios";
-import moment from "moment";
 import { useEffect, useState } from "react";
 import logo from "../assests/logo.png";
 
 import {
   Box,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
   TableContainer,
   TablePagination,
   TextField,
-  Typography,
+  Typography
 } from "@mui/material";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
+import { Link } from "react-router-dom";
 import UpdateLicense from "../components/dashboard/EditLicense";
 import { useUser } from "../Store";
-import { Link } from "react-router-dom";
 const ComingLicenses = () => {
   const { user } = useUser();
 
   const [loading, setLoading] = useState(true);
   const [licenses, setLicenses] = useState([]);
+  const [AllLicenses, setAllLicenses] = useState([]);
+
   const [departmentList, setDepartmentList] = useState([]);
+  const [departmentFilter, setDepartmentFilter] = useState();
 
   const [suppliers, setSuppliers] = useState([]);
   const [donors, setDonors] = useState([]);
@@ -37,6 +43,17 @@ const ComingLicenses = () => {
 
   const handleLimitChange = (event) => {
     setLimit(event.target.value);
+  };
+  const handleDepartmentFilter = (event) => {
+    setDepartmentFilter(event.target.value);
+    if (event.target.value === "All Departments") {
+      setLicenses(AllLicenses);
+    } else {
+      const data = AllLicenses.filter(
+        (license) => license.department._id === event.target.value._id
+      );
+      setLicenses(data);
+    }
   };
   const fetchDepartments = async () => {
     try {
@@ -55,10 +72,11 @@ const ComingLicenses = () => {
       const { data } = await axios.get("licenses");
 
       if (data?.licenses) {
-        const datax = data?.licenses.filter(
+        const nextYearLicenses = data?.licenses.filter(
           (val) => val.year > new Date().getFullYear()
         );
-        setLicenses(datax);
+        setAllLicenses(nextYearLicenses);
+        setLicenses(nextYearLicenses);
       }
       setLoading(false);
     } catch (error) {
@@ -119,6 +137,14 @@ const ComingLicenses = () => {
           />
         ) : null}
       </Box>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: { md: "left", xs: "center" },
+          alignItems: "center",
+          flexDirection: { md: "row", xs: "column" },
+        }}
+      >
       <Typography
         variant="small"
         sx={{
@@ -133,6 +159,31 @@ const ComingLicenses = () => {
       >
         Show this year licenses
       </Typography>
+      {user?.role === "director" ? (
+          <FormControl
+            size="small"
+            sx={{ width: { md: "20%", xs: "75%" }, mx: 2 }}
+          >
+            <InputLabel id="demo-simple2-select-label">Department</InputLabel>
+            <Select
+            
+              labelId="demo-simple2-select-label"
+              id="demo-simple2-select"
+              value={departmentFilter}
+              defaultValue="All Departments"
+              label="Department"
+              onChange={handleDepartmentFilter}
+            >
+              <MenuItem value="All Departments">All Departments</MenuItem>
+              {departmentList?.map((dept) => (
+                <MenuItem key={dept._id} value={dept}>
+                  {dept.name}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        ) : null}
+        </Box>
       {licenses.length ? (
         <>
           <TableContainer>
@@ -173,13 +224,7 @@ const ComingLicenses = () => {
                   <TableCell sx={{ fontWeight: "bold", textAlign: "center" }}>
                     Support Years
                   </TableCell>
-                  <TableCell sx={{ fontWeight: "bold", textAlign: "center" }}>
-                    Days left in Support Expiry
-                  </TableCell>
-
-                  <TableCell sx={{ fontWeight: "bold", textAlign: "center" }}>
-                    First Donate/Purchase
-                  </TableCell>
+                 
                   <TableCell sx={{ fontWeight: "bold", textAlign: "center" }}>
                     Donor Name
                   </TableCell>
@@ -190,13 +235,16 @@ const ComingLicenses = () => {
                     Supplier Contact
                   </TableCell>
                   <TableCell sx={{ fontWeight: "bold", textAlign: "center" }}>
+                    Url
+                  </TableCell>
+                  <TableCell sx={{ fontWeight: "bold", textAlign: "center" }}>
                     Fund Type
                   </TableCell>
 
                   <TableCell sx={{ fontWeight: "bold", textAlign: "center" }}>
                     Release Year
                   </TableCell>
-                  {!user.seeOnly ? (
+                  {!user.seeOnly && user.role !== "director" ? (
                     <TableCell sx={{ fontWeight: "bold", textAlign: "center" }}>
                       Action
                     </TableCell>
@@ -253,17 +301,9 @@ const ComingLicenses = () => {
                           <TableCell sx={{ textAlign: "center" }}>
                             {row.supportTime} years
                           </TableCell>
-                          <TableCell sx={{ textAlign: "center" }}>
-                            {row.firstDate
-                              ? row.daysTillSupportExpiry + " days"
-                              : "N/A"}
-                          </TableCell>
+                          
 
-                          <TableCell sx={{ textAlign: "center" }}>
-                            {row.firstDate
-                              ? moment(row.firstDate).format("MM/DD/YYYY")
-                              : "N/A"}
-                          </TableCell>
+                         
                           <TableCell sx={{ textAlign: "center" }}>
                             {row?.donor ? row.donor : "N/A"}
                           </TableCell>
@@ -275,12 +315,15 @@ const ComingLicenses = () => {
                             {row?.supplierContact ? row.supplierContact : "N/A"}
                           </TableCell>
                           <TableCell sx={{ textAlign: "center" }}>
+                            {row?.url ? row.url : "N/A"}
+                          </TableCell>
+                          <TableCell sx={{ textAlign: "center" }}>
                             {row?.sourceOfFund ? row.sourceOfFund : "N/A"}
                           </TableCell>
                           <TableCell sx={{ textAlign: "center" }}>
                             {row?.year}
                           </TableCell>
-                          {!user.seeOnly ? (
+                          {!user.seeOnly && user.role !== "director" ? (
                             <TableCell sx={{ textAlign: "center" }}>
                               <UpdateLicense
                                 departmentList={departmentList}

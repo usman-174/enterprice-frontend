@@ -7,6 +7,8 @@ import {
   Routes
 } from "react-router-dom";
 
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import "./App.css";
 import Dashboard from "./pages/dashboard/Dashboard";
 import Home from "./pages/Home";
@@ -56,6 +58,7 @@ function App() {
   }
   return (
     <Router>
+      <ToastContainer/>
       <Navbar />
       <Routes>
         <Route

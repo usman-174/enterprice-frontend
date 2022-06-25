@@ -6,7 +6,7 @@ import Container from "@mui/material/Container";
 import CssBaseline from "@mui/material/CssBaseline";
 import FormHelperText from "@mui/material/FormHelperText";
 import { useNavigate } from "react-router-dom";
-
+import { toast } from "react-toastify";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import axios from "axios";
@@ -19,7 +19,7 @@ function Copyright(props) {
       align="center"
       {...props}
     >
-    You will be mailed with a new Password.
+      You will be mailed with a new Password.
     </Typography>
   );
 }
@@ -30,7 +30,7 @@ export default function ForgotPassword() {
   const [error, setError] = useState("");
 
   const handleSubmit = async (event) => {
-    setError("")
+    setError("");
 
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
@@ -41,8 +41,15 @@ export default function ForgotPassword() {
       });
 
       if (data?.success) {
+        toast.info("Password sent to "+ formData.get("email"), {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+        });
         navigate(`/login`, {
-          state: { email :formData.get("email")},
+          state: { email: formData.get("email") },
         });
       }
     } catch (error) {
@@ -101,8 +108,6 @@ export default function ForgotPassword() {
           >
             {loading ? "Loading..." : "Reset Password"}
           </Button>
-         
-         
         </Box>
       </Box>
       <Copyright sx={{ mt: 0, mb: 4 }} />
