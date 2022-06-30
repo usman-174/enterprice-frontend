@@ -203,7 +203,7 @@ const Navbar = () => {
             }}
           >
             {user ? (
-              <Tooltip title={user?.role.toUpperCase()}>
+              <Tooltip title={user?.role?.toUpperCase()}>
                 <Typography
                   variant="p"
                   component="small"
