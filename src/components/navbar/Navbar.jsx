@@ -27,8 +27,12 @@ const Navbar = () => {
     const checkUser = async () => {
       try {
         const { data } = await axios.get("/auth/getUser");
-        setUser(data);
-      } catch (error) {}
+        if(data){
+          setUser(data);
+        }
+      } catch (error) {
+        setUser(null)
+      }
     };
     if (!user) {
       checkUser();
