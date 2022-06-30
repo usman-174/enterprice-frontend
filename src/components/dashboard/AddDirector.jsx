@@ -2,6 +2,9 @@ import {
   Autocomplete,
   FormControl,
   FormHelperText,
+  InputLabel,
+  MenuItem,
+  Select,
   Typography
 } from "@mui/material";
 import Box from "@mui/material/Box";
@@ -30,14 +33,16 @@ const AddDirector = ({
   allDirections,
   fetchDepartments,
 }) => {
+  const IDX = React.useId();
   const [open, setOpen] = React.useState(false);
   const [email, setEmail] = React.useState("");
   const [username, setUsername] = React.useState("");
   const [manageList, setManageList] = React.useState([]);
   const [direction, setDirection] = React.useState("");
   const [directions, setDirections] = React.useState(allDirections);
+  const [department, setDepartment] = React.useState("");
+  const [departments, setDepartments] = React.useState([]);
 
-  const [selectedDirections, setSelectedDirections] = React.useState([]);
   const [error, setError] = React.useState("");
 
   const handleChangeDirection = (_, v) => {
@@ -46,29 +51,31 @@ const AddDirector = ({
     if (v && !directions.find((x) => x.name === v)) {
       return setError("Select a valid Direction");
     }
+
     setDirection(v);
-    const departments = departmentList.filter((dept) => dept.direction === v);
+    const departmentsx = departmentList.filter((dept) => dept.direction === v);
 
-    setDirections((e) => {
-      const data = e.filter((val) => val.name !== v);
-      return data;
-    });
-    if (departments.length) {
-      setManageList((e) => [...e, ...departments]);
+    if (departmentsx.length) {
+      setDepartments(departmentsx);
     }
-    if(v?.length){
-      
-      setSelectedDirections((e) => [...e, v]);
-    }
-
-    setDirection("");
   };
   const removeManageDepartment = (val) => {
-    setError("")
-    setSelectedDirections((old) => old.filter((x) => x !== val));
-    const foundDirection = allDirections.find((d) => d.name === val);
-    setDirections((e) => [...e, foundDirection]);
-    setManageList((list) => list.filter((dept) => dept.direction !== val));
+    setError("");
+    setDepartment("");
+    setDepartments((e) => [...e, val]);
+
+    setManageList((list) => list.filter((dept) => dept._id !== val._id));
+  };
+  const handleDepartmentChange = (event) => {
+    setDepartment(event.target.value);
+    if (!manageList.find((x) => x._id === event.target.value_id)) {
+      setManageList((e) => [...e, event.target.value]);
+      const filteredDepartments = departments.filter(
+        (dept) => dept._id !== event.target.value._id
+      );
+
+      setDepartments(filteredDepartments);
+    }
   };
 
   const handleOpen = () => setOpen(true);
@@ -76,17 +83,13 @@ const AddDirector = ({
   const handleSubmit = async (e) => {
     setError("");
     e.preventDefault();
-    if (!email || !manageList.length || !directions.length) {
+    if (!email || !manageList.length) {
       return setError("Please provide all details X");
     }
- 
-   
-
     try {
       const { data } = await axios.post("auth/add_director", {
         email,
         username,
-        directions:JSON.stringify(directions),
         manageList: manageList.map((list) => list._id),
       });
       if (data?.success) {
@@ -99,12 +102,12 @@ const AddDirector = ({
       return setError(error?.response.data.message);
     }
   };
-  useEffect(()=>{
-    if(allDirections){
-      setDirections(allDirections)
+  useEffect(() => {
+    if (allDirections) {
+      setDirections(allDirections);
     }
-    // eslint-disable-next-line 
-  },[])
+    // eslint-disable-next-line
+  }, []);
   return (
     <Box sx={{ position: "relative" }}>
       <Button
@@ -174,36 +177,54 @@ const AddDirector = ({
                   <TextField {...params} label="Department Directions" />
                 )}
               />
-              <Typography
-                variant="p"
-                component="div"
-                sx={{ my: 2, display: "flex" }}
-              >
-                {selectedDirections.map((val, i) => (
-                  <Typography
-                    varaint="small"
-                    key={val + i}
-                    onClick={() => removeManageDepartment(val)}
-                    component="small"
-                    sx={{
-                      mx: 2,
-                      fontSize: "12px",
-                      p: 1.15,
-                      borderRadius: 5,
-                      background: "yellow",
-                      cursor: "pointer",
-                      "&:hover": {
-                        background: "red",
-                        p: 1.157,
-                        textDecoration: "line-through",
-                      },
-                    }}
-                  >
-                    {val}
-                  </Typography>
-                ))}
-              </Typography>
             </FormControl>
+            <FormControl sx={{ width: "60%", mt: 2 }}>
+              <InputLabel id="Department-id">Department</InputLabel>
+              <Select
+                labelId="Department-id"
+                id="demo-simple-select"
+                value={department}
+                label="Department"
+                onChange={handleDepartmentChange}
+              >
+                {departments?.map((val) => {
+                  return (
+                    <MenuItem key={val._id + val.name + IDX} value={val}>
+                      {val.name.toUpperCase()}
+                    </MenuItem>
+                  );
+                })}
+              </Select>
+            </FormControl>
+            <Typography
+              variant="p"
+              component="div"
+              sx={{ my: 2, display: "flex" }}
+            >
+              {manageList.map((val, i) => (
+                <Typography
+                  varaint="small"
+                  key={val + i}
+                  onClick={() => removeManageDepartment(val)}
+                  component="small"
+                  sx={{
+                    mx: 2,
+                    fontSize: "12px",
+                    p: 1.15,
+                    borderRadius: 5,
+                    background: "yellow",
+                    cursor: "pointer",
+                    "&:hover": {
+                      background: "red",
+                      p: 1.157,
+                      textDecoration: "line-through",
+                    },
+                  }}
+                >
+                  {val.name}
+                </Typography>
+              ))}
+            </Typography>
             <br />
 
             <Button

@@ -29,7 +29,7 @@ const ComingLicenses = () => {
   const [AllLicenses, setAllLicenses] = useState([]);
 
   const [departmentList, setDepartmentList] = useState([]);
-  const [departmentFilter, setDepartmentFilter] = useState("All Directions");
+  const [departmentFilter, setDepartmentFilter] = useState("All Departments");
 
   const [suppliers, setSuppliers] = useState([]);
   const [donors, setDonors] = useState([]);
@@ -45,20 +45,22 @@ const ComingLicenses = () => {
     setLimit(event.target.value);
   };
   const handleDepartmentFilter = (event) => {
-    
+    console.log("-----------" , event.target.value);
     setDepartmentFilter(event.target.value);
-    if (event.target.value === "All Directions") {
+    if (event.target.value === "All Departments") {
+      console.log("WORKING");
       let data = [];
-      JSON.parse(user.directions).forEach((directionX) => {
+      user.manageList.forEach((dept) => {
         const filteredLicenses = AllLicenses.filter(
-          (license) => license.department.direction === directionX.name
+          (license) => license.department._id === dept._id
         );
-        data = [...data, ...filteredLicenses];
+        data = [...data,...filteredLicenses];
       });
       setLicenses(data);
     } else {
+      const foundDept = departmentList.find(x=>x.name ===event.target.value)
       const data = AllLicenses.filter(
-        (license) => license.department.direction === event.target.value
+        (license) => license.department._id === foundDept._id
       );
       setLicenses(data);
     }
@@ -85,9 +87,9 @@ const ComingLicenses = () => {
         );
         setAllLicenses(nextYearLicenses);
         let datax = [];
-        JSON.parse(user.directions).forEach((directionX) => {
+        user.manageList.forEach((dept) => {
           const filteredLicenses = nextYearLicenses.filter(
-            (license) => license.department.direction === directionX.name
+            (license) => license.department._id === dept._id
           );
           datax = [...datax, ...filteredLicenses];
         });
@@ -176,27 +178,27 @@ const ComingLicenses = () => {
       </Typography>
       {user?.role === "director" ? (
           <FormControl
-          size="small"
-          sx={{ width: { md: "20%", xs: "75%" }, mx: 2 }}
-        >
-          <InputLabel id="demo-simple2-select-label">Directions</InputLabel>
-          <Select
-            labelId="demo-simple2-select-label"
-            id="demo-simple2-select"
-            value={departmentFilter}
-            defaultValue={"All Directions"}
-            label="Directions"
-            onChange={handleDepartmentFilter}
+            size="small"
+            sx={{ width: { md: "20%", xs: "75%" }, mx: 2 }}
           >
-            <MenuItem value="All Directions">All Directions</MenuItem>
-            {JSON.parse(user.directions)?.map((direction) => (
-              <MenuItem key={direction._id} value={direction.name}>
-                {direction.name}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      ) : null}
+            <InputLabel id="demo-simple2-select-label">Departments</InputLabel>
+            <Select
+              labelId="demo-simple2-select-label"
+              id="demo-simple2-select"
+              value={departmentFilter}
+              defaultValue={"All Departments"}
+              label="Departments"
+              onChange={handleDepartmentFilter}
+            >
+              <MenuItem value={"All Departments"}>All Departments</MenuItem>
+              {user.manageList.map((dept) => (
+                <MenuItem key={dept._id} value={dept.name}>
+                  {dept.name}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        ) : null}
         </Box>
       {licenses.length ? (
         <>

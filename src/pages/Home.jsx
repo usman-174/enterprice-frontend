@@ -29,7 +29,7 @@ const Home = () => {
   const [licenses, setLicenses] = useState([]);
   const [AllLicenses, setAllLicenses] = useState([]);
   const [departmentList, setDepartmentList] = useState([]);
-  const [departmentFilter, setDepartmentFilter] = useState("All Directions");
+  const [departmentFilter, setDepartmentFilter] = useState("All Departments");
   const [suppliers, setSuppliers] = useState([]);
   const [donors, setDonors] = useState([]);
   const [currentPage, setCurrentPage] = useState(0);
@@ -44,20 +44,22 @@ const Home = () => {
     setLimit(event.target.value);
   };
   const handleDepartmentFilter = (event) => {
-
+    console.log("-----------" , event.target.value);
     setDepartmentFilter(event.target.value);
-    if (event.target.value === "All Directions") {
+    if (event.target.value === "All Departments") {
+      console.log("WORKING");
       let data = [];
-      JSON.parse(user.directions).forEach((directionX) => {
+      user.manageList.forEach((dept) => {
         const filteredLicenses = AllLicenses.filter(
-          (license) => license.department.direction === directionX.name
+          (license) => license.department._id === dept._id
         );
-        data = [...data, ...filteredLicenses];
+        data = [...data,...filteredLicenses];
       });
       setLicenses(data);
     } else {
+      const foundDept = departmentList.find(x=>x.name ===event.target.value)
       const data = AllLicenses.filter(
-        (license) => license.department.direction === event.target.value
+        (license) => license.department._id === foundDept._id
       );
       setLicenses(data);
     }
@@ -85,9 +87,9 @@ const Home = () => {
         setAllLicenses(thisYearLicenses);
 
         let datax = [];
-        JSON.parse(user.directions).forEach((directionX) => {
+        user.manageList.forEach((dept) => {
           const filteredLicenses = thisYearLicenses.filter(
-            (license) => license.department.direction === directionX.name
+            (license) => license.department._id === dept._id
           );
           datax = [...datax, ...filteredLicenses];
         });
@@ -185,19 +187,19 @@ const Home = () => {
             size="small"
             sx={{ width: { md: "20%", xs: "75%" }, mx: 2 }}
           >
-            <InputLabel id="demo-simple2-select-label">Directions</InputLabel>
+            <InputLabel id="demo-simple2-select-label">Departments</InputLabel>
             <Select
               labelId="demo-simple2-select-label"
               id="demo-simple2-select"
               value={departmentFilter}
-              defaultValue={"All Directions"}
-              label="Directions"
+              defaultValue={"All Departments"}
+              label="Departments"
               onChange={handleDepartmentFilter}
             >
-              <MenuItem value="All Directions">All Directions</MenuItem>
-              {JSON.parse(user.directions)?.map((direction) => (
-                <MenuItem key={direction._id} value={direction.name}>
-                  {direction.name}
+              <MenuItem value={"All Departments"}>All Departments</MenuItem>
+              {user.manageList.map((dept) => (
+                <MenuItem key={dept._id} value={dept.name}>
+                  {dept.name}
                 </MenuItem>
               ))}
             </Select>
@@ -222,9 +224,7 @@ const Home = () => {
                   <TableCell sx={{ fontWeight: "bold", textAlign: "center" }}>
                     Name
                   </TableCell>
-                  <TableCell sx={{ fontWeight: "bold", textAlign: "center" }}>
-                    Department Direction
-                  </TableCell>
+                 
                   <TableCell sx={{ fontWeight: "bold", textAlign: "center" }}>
                     Department Name
                   </TableCell>
@@ -294,9 +294,10 @@ const Home = () => {
                           val.name.toLowerCase().includes(query) ||
                           val.description.toLowerCase().includes(query) ||
                           val.type.toLowerCase().includes(query) ||
-                          val?.department?.direction.toLowerCase().includes(query)||
+                          val?.department?.direction
+                            .toLowerCase()
+                            .includes(query) ||
                           val?.department?.name.toLowerCase().includes(query)
-
                         ) {
                           returnValue = true;
                         }
@@ -309,9 +310,7 @@ const Home = () => {
                           <TableCell sx={{ textAlign: "center" }}>
                             {row.name}
                           </TableCell>
-                          <TableCell sx={{ textAlign: "center" }}>
-                            {row?.department?.direction}
-                          </TableCell>
+                        
                           <TableCell sx={{ textAlign: "center" }}>
                             {row?.department?.name}
                           </TableCell>

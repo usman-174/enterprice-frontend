@@ -38,7 +38,7 @@ function App() {
     const checkUser = async () => {
       try {
         const { data } = await axios.get("/auth/getUser");
-        console.log(data);
+    
         setUser(data);
         setLoading(false);
       } catch (error) {

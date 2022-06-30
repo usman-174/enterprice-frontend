@@ -4,9 +4,11 @@ import {
   FormControl,
   FormHelperText,
   IconButton,
-  Typography,
+  InputLabel,
+  MenuItem,
+  Select,
+  Typography
 } from "@mui/material";
-import _ from "underscore";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Modal from "@mui/material/Modal";
@@ -34,49 +36,56 @@ const UpdateDirector = ({
   departmentList,
   allDirections,
 }) => {
+  const IDX = React.useId();
+
   const [open, setOpen] = React.useState(false);
   const [email, setEmail] = React.useState(user?.email || "");
   const [username, setUsername] = React.useState(user?.username || "");
   const [directions, setDirections] = React.useState(allDirections || []);
   const [direction, setDirection] = React.useState("");
 
-  const [selectedDirections, setSelectedDirections] = React.useState([]);
+  const [department, setDepartment] = React.useState("");
+  const [departments, setDepartments] = React.useState([]);
 
   const [error, setError] = React.useState("");
   const [manageList, setManageList] = React.useState(user?.manageList || []);
-  // const [departments, setDepartments] = React.useState([]);
 
   const handleChangeDirection = (_, v) => {
     setError("");
 
-    if (v && !directions.find((x) => x === v)) {
+    if (v && !directions.find((x) => x.name === v)) {
       return setError("Select a valid Direction");
     }
-    setDirection(v);
-    const departments = departmentList.filter((dept) => dept.direction === v);
-  
-    setDirections((e) => {
-      const data = e.filter((val) => val !== v);
-      return data;
-    });
-    if (departments.length) {
-      // alert("Adding" + JSON.stringify(departments))
-      setManageList((e) => [...e, ...departments]);
-    }
-    if (v?.length) {
-      setSelectedDirections((e) => [...e, v]);
-    }
 
-    setDirection("");
+    setDirection(v);
+    const departmentsx = departmentList.filter((dept) => dept.direction === v);
+    const res = departmentsx.filter(dept=>!manageList.find(x=>x._id===dept._id))
+    console.log({ departmentsx, manageList, res });
+   
+      setDepartments(res);
+    
   };
   const removeManageDepartment = (val) => {
     setError("");
-    setSelectedDirections((old) => old.filter((x) => x !== val));
-    const foundDirection = allDirections.find((d) => d.name === val);
-    setDirections((e) => [...e, foundDirection.name]);
-    setManageList((list) => list.filter((dept) => dept.direction !== val));
+    setDepartment("");
+    if(!departments.find(x=>x._id === val._id)){
+      setDepartments((e) => [...e, val]);
+    }
+    setManageList((list) => list.filter((dept) => dept._id !== val._id));
   };
+  const handleDepartmentChange = (event) => {
+    if (!manageList.find((x) => x._id === event.target.value._id)) {
+      setManageList((e) => [...e, event.target.value]);
+      const filteredDepartments = departments.filter(
+        (dept) => dept._id !== event.target.value._id
+      );
 
+      setDepartments(filteredDepartments);
+      setDepartment(event.target.value);
+    } else {
+      setDepartment("");
+    }
+  };
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
   const handleSubmit = async (e) => {
@@ -89,20 +98,6 @@ const UpdateDirector = ({
 
     if (username && username !== user.username) {
       fields.username = username;
-    }
-    if (
-      directions.length &&
-      JSON.stringify(directions) !== JSON.stringify(user.directions)
-    ) {
-      const data = [];
-      selectedDirections.forEach((directionX) => {
-        const found = allDirections.find((direction) => {
-
-          return direction.name === directionX;
-        });
-        if (found) data.push(found);
-      });
-      fields.directions = JSON.stringify(data);
     }
 
     try {
@@ -122,40 +117,12 @@ const UpdateDirector = ({
     }
   };
   useEffect(() => {
-    let usedDirections = [];
-
-    JSON.parse(user?.directions).forEach((direction) => {
-      manageList.forEach((dept) => {
-        if (
-          direction.name === dept.direction &&
-          !usedDirections.find((x) => x === direction.name)
-        ) {
-
-          usedDirections.push(direction.name);
-        }
-      });
-    });
-
-    
-    setSelectedDirections(usedDirections);
-    const available = _.without(
-      allDirections.map((x) => x.name),
-      ...usedDirections
-    );
-   
-    setDirections(available);
+    if (allDirections) {
+      setDirections(allDirections);
+    }
     // eslint-disable-next-line
   }, []);
-  // useEffect(() => {
-  //   const filteredDepartments = [];
-  //   departmentList.forEach((dept1) => {
-  //     const found = manageList.find((dept2) => dept2._id === dept1._id);
-  //     if (!found) filteredDepartments.push(dept1);
-  //   });
 
-  //   setDepartments(filteredDepartments);
-  //   // eslint-disable-next-line
-  // }, []);
   return (
     <>
       <IconButton
@@ -222,41 +189,60 @@ const UpdateDirector = ({
                 fullWidth
                 value={direction}
                 onChange={handleChangeDirection}
-                options={directions.map((option) => option)}
+                options={directions.map((option) => option?.name)}
                 renderInput={(params) => (
                   <TextField {...params} label="Department Directions" />
                 )}
               />
-              <Typography
-                variant="p"
-                component="div"
-                sx={{ my: 2, display: "flex" }}
-              >
-                {selectedDirections.map((val, i) => (
-                  <Typography
-                    varaint="small"
-                    key={val + i}
-                    onClick={() => removeManageDepartment(val)}
-                    component="small"
-                    sx={{
-                      mx: 2,
-                      fontSize: "12px",
-                      p: 1.15,
-                      borderRadius: 5,
-                      background: "yellow",
-                      cursor: "pointer",
-                      "&:hover": {
-                        background: "red",
-                        p: 1.157,
-                        textDecoration: "line-through",
-                      },
-                    }}
-                  >
-                    {val}
-                  </Typography>
-                ))}
-              </Typography>
             </FormControl>
+            <FormControl sx={{ width: "60%", mt: 2 }}>
+              <InputLabel id="Department-id">Department</InputLabel>
+              <Select
+                disabled={!direction }
+                labelId="Department-id"
+                id="demo-simple-select"
+                value={department}
+                label="Department"
+                onChange={handleDepartmentChange}
+              >
+                {departments?.map((val) => {
+                  return (
+                    <MenuItem key={val._id + val.name + IDX} value={val}>
+                      {val.name.toUpperCase()}
+                    </MenuItem>
+                  );
+                })}
+              </Select>
+            </FormControl>
+            <Typography
+              variant="p"
+              component="div"
+              sx={{ my: 2, display: "flex" }}
+            >
+              {manageList.map((val, i) => (
+                <Typography
+                  varaint="small"
+                  key={val + i}
+                  onClick={() => removeManageDepartment(val)}
+                  component="small"
+                  sx={{
+                    mx: 2,
+                    fontSize: "12px",
+                    p: 1.15,
+                    borderRadius: 5,
+                    background: "yellow",
+                    cursor: "pointer",
+                    "&:hover": {
+                      background: "red",
+                      p: 1.157,
+                      textDecoration: "line-through",
+                    },
+                  }}
+                >
+                  {val.name}
+                </Typography>
+              ))}
+            </Typography>
             <br />
             <Button
               type="submit"

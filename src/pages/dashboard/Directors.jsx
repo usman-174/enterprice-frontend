@@ -3,7 +3,7 @@ import {
   TableContainer,
   TablePagination,
   TextField,
-  Typography
+  Typography,
 } from "@mui/material";
 import axios from "axios";
 import { useEffect, useState } from "react";
@@ -29,19 +29,12 @@ const Directors = () => {
   const [departmentList, setDepartmentList] = useState([]);
   const [directions, setDirections] = useState([]);
   const fetchDirections = async () => {
-      try {
-        
-        const { data } = await axios.get("directions");
-  
-        if (data?.directions) {
-          setDirections(data?.directions);
-        }
-     
-      } catch (error) {
-        
-      
-      }
-    };
+    const { data } = await axios.get("directions");
+
+    if (data?.directions) {
+      setDirections(data?.directions);
+    }
+  };
   const handlePagination = (_, page) => {
     setCurrentPage(page);
   };
@@ -86,7 +79,7 @@ const Directors = () => {
   useEffect(() => {
     fetchDirectors();
     fetchDepartments();
-    fetchDirections()
+    fetchDirections();
     // eslint-disable-next-line
   }, []);
   if (loading && !directors.length) {
@@ -101,7 +94,7 @@ const Directors = () => {
             value={searchQ}
             sx={{ width: { md: "40%", lg: "25%", xs: "80%" } }}
             onChange={(e) => setSearchQ(e.target.value)}
-            label="Search Users"
+            label="Search Directors"
             variant="outlined"
             size="small"
           />
@@ -132,9 +125,7 @@ const Directors = () => {
               <TableCell sx={{ fontWeight: "bold" }}>
                 Managing Departments
               </TableCell>
-              <TableCell sx={{ fontWeight: "bold" }}>
-                Directions
-              </TableCell>
+
               <TableCell sx={{ fontWeight: "bold", textAlign: "center" }}>
                 Action
               </TableCell>
@@ -142,23 +133,23 @@ const Directors = () => {
           </TableHead>
           <TableBody>
             {directors
-            .filter((val) => {
-              const query = searchQ.trim().toLowerCase();
-              let returnValue = false;
+              .filter((val) => {
+                const query = searchQ.trim().toLowerCase();
+                let returnValue = false;
 
-              if (query.length === "") {
-                returnValue = false;
-              } else if (
-                val.username.toLowerCase().includes(query) ||
-                val.email.toLowerCase().includes(query) ||
-                val.role.toLowerCase().includes(query) 
-              ) {
-                returnValue = true;
-              }
-              return returnValue;
-            })
+                if (query.length === "") {
+                  returnValue = false;
+                } else if (
+                  val.username.toLowerCase().includes(query) ||
+                  val.email.toLowerCase().includes(query) ||
+                  val.role.toLowerCase().includes(query)
+                ) {
+                  returnValue = true;
+                }
+                return returnValue;
+              })
               .slice(0, limit)
-              
+
               .map((row) => (
                 <TableRow key={row._id}>
                   <TableCell>{row.email}</TableCell>
@@ -175,30 +166,15 @@ const Directors = () => {
                         {list.name}
                       </Typography>
                     ))}
-                    
                   </TableCell>
-                  <TableCell>
-                    {row.directions? JSON.parse(row.directions).map((list) => (
-                      <Typography
-                        varaint="small"
-                        key={list._id}
-                        component="small"
-                        sx={{ mx: 1, fontSize: "12px" }}
-                      >
-                        {list.name}
-                      </Typography>
-                    )) : "N/A"}
-                    
-                  </TableCell>
+
                   <TableCell sx={{ textAlign: "center" }}>
                     <AlertDialog handleDelete={handleDeleteUser} id={row._id} />
                     <UpdateDirector
                       loading={loading}
                       allDirections={directions}
-
                       departmentList={departmentList}
                       fetchUsers={fetchDirectors}
-                     
                       user={row}
                     />
                   </TableCell>
