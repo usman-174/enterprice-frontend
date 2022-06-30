@@ -28,9 +28,8 @@ const Home = () => {
   const [loading, setLoading] = useState(true);
   const [licenses, setLicenses] = useState([]);
   const [AllLicenses, setAllLicenses] = useState([]);
-
   const [departmentList, setDepartmentList] = useState([]);
-  const [departmentFilter, setDepartmentFilter] = useState();
+  const [departmentFilter, setDepartmentFilter] = useState("All Directions");
   const [suppliers, setSuppliers] = useState([]);
   const [donors, setDonors] = useState([]);
   const [currentPage, setCurrentPage] = useState(0);
@@ -45,12 +44,20 @@ const Home = () => {
     setLimit(event.target.value);
   };
   const handleDepartmentFilter = (event) => {
+
     setDepartmentFilter(event.target.value);
-    if (event.target.value === "All Departments") {
-      setLicenses(AllLicenses);
+    if (event.target.value === "All Directions") {
+      let data = [];
+      JSON.parse(user.directions).forEach((directionX) => {
+        const filteredLicenses = AllLicenses.filter(
+          (license) => license.department.direction === directionX.name
+        );
+        data = [...data, ...filteredLicenses];
+      });
+      setLicenses(data);
     } else {
       const data = AllLicenses.filter(
-        (license) => license.department._id === event.target.value._id
+        (license) => license.department.direction === event.target.value
       );
       setLicenses(data);
     }
@@ -76,7 +83,15 @@ const Home = () => {
           (val) => val.year <= new Date().getFullYear()
         );
         setAllLicenses(thisYearLicenses);
-        setLicenses(thisYearLicenses);
+
+        let datax = [];
+        JSON.parse(user.directions).forEach((directionX) => {
+          const filteredLicenses = thisYearLicenses.filter(
+            (license) => license.department.direction === directionX.name
+          );
+          datax = [...datax, ...filteredLicenses];
+        });
+        setLicenses(datax);
       }
       setLoading(false);
     } catch (error) {
@@ -170,19 +185,19 @@ const Home = () => {
             size="small"
             sx={{ width: { md: "20%", xs: "75%" }, mx: 2 }}
           >
-            <InputLabel id="demo-simple2-select-label">Department</InputLabel>
+            <InputLabel id="demo-simple2-select-label">Directions</InputLabel>
             <Select
               labelId="demo-simple2-select-label"
               id="demo-simple2-select"
               value={departmentFilter}
-              defaultValue="All Departments"
-              label="Department"
+              defaultValue={"All Directions"}
+              label="Directions"
               onChange={handleDepartmentFilter}
             >
-              <MenuItem value="All Departments">All Departments</MenuItem>
-              {departmentList?.map((dept) => (
-                <MenuItem key={dept._id} value={dept}>
-                  {dept.name}
+              <MenuItem value="All Directions">All Directions</MenuItem>
+              {JSON.parse(user.directions)?.map((direction) => (
+                <MenuItem key={direction._id} value={direction.name}>
+                  {direction.name}
                 </MenuItem>
               ))}
             </Select>
@@ -208,7 +223,10 @@ const Home = () => {
                     Name
                   </TableCell>
                   <TableCell sx={{ fontWeight: "bold", textAlign: "center" }}>
-                    Department
+                    Department Direction
+                  </TableCell>
+                  <TableCell sx={{ fontWeight: "bold", textAlign: "center" }}>
+                    Department Name
                   </TableCell>
 
                   <TableCell sx={{ fontWeight: "bold", textAlign: "center" }}>
@@ -276,7 +294,9 @@ const Home = () => {
                           val.name.toLowerCase().includes(query) ||
                           val.description.toLowerCase().includes(query) ||
                           val.type.toLowerCase().includes(query) ||
+                          val?.department?.direction.toLowerCase().includes(query)||
                           val?.department?.name.toLowerCase().includes(query)
+
                         ) {
                           returnValue = true;
                         }
@@ -288,6 +308,9 @@ const Home = () => {
                         <TableRow key={row._id}>
                           <TableCell sx={{ textAlign: "center" }}>
                             {row.name}
+                          </TableCell>
+                          <TableCell sx={{ textAlign: "center" }}>
+                            {row?.department?.direction}
                           </TableCell>
                           <TableCell sx={{ textAlign: "center" }}>
                             {row?.department?.name}

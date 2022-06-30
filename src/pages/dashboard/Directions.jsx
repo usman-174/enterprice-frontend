@@ -1,41 +1,26 @@
 import { Box, TableContainer, TablePagination, TextField } from "@mui/material";
 import axios from "axios";
 import { useEffect, useState } from "react";
-import logo from "../../assests/logo.png";
 
 import Table from "@mui/material/Table";
+
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
-import moment from "moment";
+
+import logo from "../../assests/logo.png";
 import AlertDialog from "../../components/AlertDialog";
-import AddDepartment from "../../components/dashboard/AddDepartment";
-import UpdateDepartment from "../../components/dashboard/EditDepartment";
-const Departments = () => {
+import AddDirection from "../../components/dashboard/AddDirection";
+import EditDirection from "../../components/dashboard/EditDirection";
+
+const Directions = () => {
   const [loading, setLoading] = useState(true);
-  const [departments, setDepartments] = useState([]);
-
+  const [directions, setDirections] = useState([]);
   const [currentPage, setCurrentPage] = useState(0);
-
-
   const [searchQ, setSearchQ] = useState("");
   const [limit, setLimit] = useState(10);
-  const [directions, setDirections] = useState([]);
-  const fetchDirections = async () => {
-      try {
-        
-        const { data } = await axios.get("directions");
-  
-        if (data?.directions) {
-          setDirections(data?.directions);
-        }
-     
-      } catch (error) {
-        
-      
-      }
-    };
+
   const handlePagination = (_, page) => {
     setCurrentPage(page);
   };
@@ -43,24 +28,13 @@ const Departments = () => {
   const handleLimitChange = (event) => {
     setLimit(event.target.value);
   };
-  const handleDeleteDepartments = async (id) => {
-    try {
-      console.log("Deleting Department");
-      const { data } = await axios.delete(`/departments/${id}`);
-      if (data?.success) {
-        fetchDepartments();
-      }
-    } catch (error) {
-      alert(error?.response.data.message);
-    }
-  };
-  const fetchDepartments = async () => {
+  const fetchDirections = async () => {
     try {
       setLoading(true);
-      const { data } = await axios.get("departments");
+      const { data } = await axios.get("directions");
 
-      if (data?.departments) {
-        setDepartments(data?.departments);
+      if (data?.directions) {
+        setDirections(data?.directions);
       }
       setLoading(false);
     } catch (error) {
@@ -68,53 +42,55 @@ const Departments = () => {
       setLoading(false);
     }
   };
- 
 
+  const handleDeleteDonor = async (id) => {
+    try {
+      const { data } = await axios.delete("directions/" + id);
+      if (data?.success) {
+        return fetchDirections();
+      }
+    } catch (error) {
+      alert("Failed to delete the Supplier");
+    }
+  };
   useEffect(() => {
-    fetchDepartments();
-    fetchDirections()
+    fetchDirections();
+
     // eslint-disable-next-line
   }, []);
-  if (loading && !departments.length) {
+  if (loading && !directions.length) {
     return <img src={logo} alt="loading" className="loader" />;
   }
   return (
-    <Box sx={{ margin: "20px" }}>
+    <Box sx={{ margin: { md: "50px", xs: "20px" } }}>
       <Box sx={{ margin: "20px auto", textAlign: "center" }}>
-        {departments.length ? (
+        {directions.length ? (
           <TextField
             id="outlined-basic"
             value={searchQ}
             sx={{ width: { md: "40%", lg: "25%", xs: "80%" } }}
             onChange={(e) => setSearchQ(e.target.value)}
-            label="Search Departments"
+            label="Search Directions"
             variant="outlined"
             size="small"
           />
         ) : null}
       </Box>
-      <AddDepartment
-       directions={directions}
-        fetchDepartments={fetchDepartments}
-      />
+      <AddDirection fetchDirections={fetchDirections} />
       <TableContainer>
         <Table
           size="small"
           sx={{
             padding: "10px",
             margin: "auto",
-            width: "94%",
+
             textAlign: "center",
           }}
         >
           <TableHead>
             <TableRow>
-              <TableCell sx={{ fontWeight: "bold" }}>ID</TableCell>
-              <TableCell sx={{ fontWeight: "bold" }}>Name</TableCell>
-              <TableCell sx={{ fontWeight: "bold" }}>Direction</TableCell>
-
-              <TableCell sx={{ fontWeight: "bold" }}>Description</TableCell>
-              <TableCell sx={{ fontWeight: "bold" }}>CreatedAt</TableCell>
+              <TableCell sx={{ fontWeight: "bold" }}>id</TableCell>
+              <TableCell sx={{ fontWeight: "bold" }}>name</TableCell>
 
               <TableCell sx={{ fontWeight: "bold", textAlign: "center" }}>
                 Action
@@ -122,7 +98,7 @@ const Departments = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {departments
+            {directions
               .slice(0, limit)
               .filter((val) => {
                 const query = searchQ.trim().toLowerCase();
@@ -130,36 +106,22 @@ const Departments = () => {
 
                 if (query.length === "") {
                   returnValue = false;
-                } else if (
-                  val.name.toLowerCase().includes(query) ||
-                  val.description.toLowerCase().includes(query)
-                ) {
+                } else if (val.name.toLowerCase().includes(query)) {
                   returnValue = true;
                 }
                 return returnValue;
               })
               .map((row) => (
                 <TableRow key={row._id}>
-                  <TableCell>{row._id}</TableCell>
-
+                  <TableCell >{row._id}</TableCell>
                   <TableCell>{row.name}</TableCell>
-                  <TableCell>{row?.direction || "N/A"}</TableCell>
-                  <TableCell>{row.description}</TableCell>
-                  <TableCell>
-                    {moment(row.createdAt).format("MM/DD/YYYY")}
-                  </TableCell>
 
                   <TableCell sx={{ textAlign: "center" }}>
                     <AlertDialog
-                      handleDelete={handleDeleteDepartments}
+                      handleDelete={handleDeleteDonor}
                       id={row._id}
                     />
-                    <UpdateDepartment
-                      loading={loading}
-                      directions={directions}
-                      fetchDepartments={fetchDepartments}
-                      department={row}
-                    />
+                    <EditDirection fetchDirections={fetchDirections} direction={row} loading={loading} />
                   </TableCell>
                 </TableRow>
               ))}
@@ -170,7 +132,7 @@ const Departments = () => {
       <TablePagination
         component="div"
         sx={{ marginRight: "40px" }}
-        count={departments?.length}
+        count={directions?.length}
         onPageChange={handlePagination}
         onRowsPerPageChange={handleLimitChange}
         page={currentPage}
@@ -181,4 +143,4 @@ const Departments = () => {
   );
 };
 
-export default Departments;
+export default Directions;

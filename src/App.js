@@ -26,6 +26,7 @@ import Directors from "./pages/dashboard/Directors";
 import Suppliers from "./pages/dashboard/Suppliers";
 import Donors from "./pages/dashboard/Donors";
 import ComingLicenses from "./pages/ComingLicenses";
+import Directions from "./pages/dashboard/Directions";
 
 
 
@@ -105,6 +106,8 @@ function App() {
           <Route path="directors" element={<Directors />} />
           <Route path="suppliers" element={<Suppliers />} />
           <Route path="donors" element={<Donors />} />
+          <Route path="directions" element={<Directions />} />
+
 
 
 

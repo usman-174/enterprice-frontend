@@ -149,7 +149,7 @@ const UpdateUser = ({ user, loading, fetchUsers, departmentList }) => {
               autoComplete="username"
               autoFocus
             />
-            <FormControl sx={{ width: "60%", mt: 2 }}>
+           {user.role !== "admin"? <FormControl sx={{ width: "60%", mt: 2 }}>
               <InputLabel id="Department-id">Department</InputLabel>
               <Select
                 labelId="Department-id"
@@ -166,7 +166,7 @@ const UpdateUser = ({ user, loading, fetchUsers, departmentList }) => {
                   );
                 })}
               </Select>
-            </FormControl>
+            </FormControl>:null}
 
             <FormControl sx={{ width: "60%", mt: 2 }}>
               <InputLabel id="Role-id">Role</InputLabel>
@@ -183,7 +183,7 @@ const UpdateUser = ({ user, loading, fetchUsers, departmentList }) => {
                 <MenuItem value="user">User</MenuItem>
               </Select>
             </FormControl>
-            <Box sx={{mx:1}}>
+           {user.role !== "admin"? <Box sx={{mx:1}}>
               <FormControlLabel
                 control={
                   <Checkbox
@@ -194,7 +194,7 @@ const UpdateUser = ({ user, loading, fetchUsers, departmentList }) => {
                 }
                 label="View Only"
               />
-            </Box>
+            </Box> : null}
             <br />
             <Button
               type="submit"

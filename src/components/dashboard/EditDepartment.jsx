@@ -1,4 +1,5 @@
 import {
+  Autocomplete,
     FormHelperText, IconButton
 } from "@mui/material";
 import Box from "@mui/material/Box";
@@ -22,7 +23,7 @@ const style = {
   p: 4,
 };
 
-const UpdateDepartment = ({  loading,fetchDepartments ,department}) => {
+const UpdateDepartment = ({  loading,fetchDepartments ,department,directions}) => {
   const [open, setOpen] = React.useState(false);
   const [description, setDescription] = React.useState(department?.description || "");
   const [name, setName] = React.useState(department?.name || "");
@@ -47,6 +48,11 @@ const UpdateDepartment = ({  loading,fetchDepartments ,department}) => {
     if (direction && direction !== department.direction) {
       fields.direction = direction;
     }
+    if(!directions.find(x=>x.name===direction)){
+      return setError("Select a valid Direction");
+    }
+    
+   
     try {
       const { data } = await axios.put(`departments/${department._id}`, fields);
       if (data?.success) {
@@ -104,7 +110,7 @@ const UpdateDepartment = ({  loading,fetchDepartments ,department}) => {
               autoComplete="name"
               autoFocus
             />
-             <TextField
+             {/* <TextField
                 margin="normal"
                 required
                 fullWidth
@@ -115,7 +121,18 @@ const UpdateDepartment = ({  loading,fetchDepartments ,department}) => {
                 name="direction"
            
                 autoFocus
-              />
+              /> */}
+                <Autocomplete
+              id="directions"
+              fullWidth
+            
+              value={direction}
+              onChange={(_,v)=>setDirection(v)}
+              options={directions.map((option) => option.name)}
+              renderInput={(params) => (
+                <TextField {...params} label="Direction" />
+              )}
+            />
             <TextField
               margin="normal"
               required

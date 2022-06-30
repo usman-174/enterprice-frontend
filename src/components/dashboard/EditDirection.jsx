@@ -1,5 +1,7 @@
-import { Autocomplete, FormHelperText } from "@mui/material";
+import { FormHelperText, IconButton } from "@mui/material";
 import Box from "@mui/material/Box";
+import BorderColorIcon from "@mui/icons-material/BorderColor";
+
 import Button from "@mui/material/Button";
 import Modal from "@mui/material/Modal";
 import TextField from "@mui/material/TextField";
@@ -18,48 +20,49 @@ const style = {
   p: 4,
 };
 
-const AddDepartment = ({ fetchDepartments, directions }) => {
+const EditDirection = ({ loading, fetchDirections, direction }) => {
   const [open, setOpen] = React.useState(false);
-  const [title, setTitle] = React.useState("");
-  const [direction, setDirection] = React.useState("");
+  const [name, setName] = React.useState(direction?.name || "");
 
-  const [description, setDescription] = React.useState("");
   const [error, setError] = React.useState("");
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
   const handleSubmit = async (e) => {
     setError("");
+    if (name === direction.name) {
+      setError("Please change a field.");
+    }
     e.preventDefault();
-    if (!title || !description || !direction) {
-      return setError("Please provide all details");
+    let fields = {};
+    if (name && name !== direction.name) {
+      fields.name = name;
     }
-    if(!directions.find(x=>x.name===direction)){
-      return setError("Select a valid Direction");
-    }
+
     try {
-      const { data } = await axios.post("departments/", {
-        name: title,
-        description,
-        direction,
-      });
+      const { data } = await axios.put(`directions/${direction._id}`, fields);
       if (data?.success) {
-        fetchDepartments();
-        return handleClose();
+        fetchDirections();
+        if (!loading) {
+          return handleClose();
+        }
       }
     } catch (error) {
+      console.log(error?.message);
       return setError(error?.response.data.message);
     }
   };
   return (
     <>
-      <Button
-        variant="contained"
+      <IconButton
+        sx={{ margin: "5px" }}
+        title="Update User"
+        size="small"
+        aria-label="delete"
         onClick={handleOpen}
-        sx={{ margin: { md: "20px 60px" } }}
       >
-        Add Department
-      </Button>
+        <BorderColorIcon  sx={{ color: "#3D57DB" }} />
+      </IconButton>
       <Modal
         open={open}
         onClose={handleClose}
@@ -89,46 +92,22 @@ const AddDepartment = ({ fetchDepartments, directions }) => {
               margin="normal"
               required
               fullWidth
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              id="title"
-              label="Title"
-              name="title"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              id="name"
+              label="Direction Title"
+              name="name"
+              autoComplete="name"
               autoFocus
             />
-            
-            <Autocomplete
-              id="directions"
-              fullWidth
-              freeSolo
-             
-              onChange={(_,v)=>setDirection(v)}
-              options={directions.map((option) => option.name)}
-              renderInput={(params) => (
-                <TextField {...params} label="Direction" />
-              )}
-            />
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              id="decription"
-              multiline
-              minRows={5}
-              label="Description"
-              name="decription"
-              autoFocus
-            />
-
+          
             <Button
               type="submit"
               size="large"
               variant="contained"
               sx={{ margin: "20px auto", textAlign: "center" }}
             >
-              Add Department
+              {loading ? "Updating..." : " Update Direction"}
             </Button>
           </Box>
         </Box>
@@ -137,4 +116,4 @@ const AddDepartment = ({ fetchDepartments, directions }) => {
   );
 };
 
-export default AddDepartment;
+export default EditDirection;

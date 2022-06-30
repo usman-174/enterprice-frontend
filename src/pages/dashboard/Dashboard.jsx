@@ -73,6 +73,22 @@ const Dashboard = () => {
             fontSize: "22px",
           }}
           component={Link}
+          to={"directions"}
+        >
+          Directions
+        </Button>
+        <Button
+          variant="contained"
+          sx={{
+            margin: "5px 20px",
+            backgroundColor: "#f2f232",
+            color: "#3D57DB",
+            "&:hover": {
+              color: "#FFFF00",
+            },
+            fontSize: "22px",
+          }}
+          component={Link}
           to={"licenses"}
         >
           Licenses

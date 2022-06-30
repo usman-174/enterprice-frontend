@@ -1,17 +1,15 @@
 import {
+  Autocomplete,
   FormControl,
   FormHelperText,
-  InputLabel,
-  MenuItem,
-  Select,
-  Typography,
+  Typography
 } from "@mui/material";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Modal from "@mui/material/Modal";
 import TextField from "@mui/material/TextField";
 import axios from "axios";
-import React from "react";
+import React, { useEffect } from "react";
 const style = {
   position: "absolute",
   top: "50%",
@@ -28,36 +26,49 @@ const style = {
 
 const AddDirector = ({
   departmentList,
-  setDepartmentList,
   fetchUsers,
+  allDirections,
   fetchDepartments,
 }) => {
   const [open, setOpen] = React.useState(false);
   const [email, setEmail] = React.useState("");
   const [username, setUsername] = React.useState("");
   const [manageList, setManageList] = React.useState([]);
+  const [direction, setDirection] = React.useState("");
+  const [directions, setDirections] = React.useState(allDirections);
 
+  const [selectedDirections, setSelectedDirections] = React.useState([]);
   const [error, setError] = React.useState("");
 
+  const handleChangeDirection = (_, v) => {
+    setError("");
 
-  const handleDepartmentChange = (ex) => {
-    setManageList((e) => {
-      const data = [...e, ex.target.value];
+    if (v && !directions.find((x) => x.name === v)) {
+      return setError("Select a valid Direction");
+    }
+    setDirection(v);
+    const departments = departmentList.filter((dept) => dept.direction === v);
+
+    setDirections((e) => {
+      const data = e.filter((val) => val.name !== v);
       return data;
     });
-    setDepartmentList((e) => {
-      const data = e.filter((val) => val._id !== ex.target.value._id);
-      return data;
-    });
-    
+    if (departments.length) {
+      setManageList((e) => [...e, ...departments]);
+    }
+    if(v?.length){
+      
+      setSelectedDirections((e) => [...e, v]);
+    }
+
+    setDirection("");
   };
   const removeManageDepartment = (val) => {
-    setManageList((e) => e.filter((x) => x._id !== val._id));
-    setDepartmentList((e) => {
-      if (!e.find((dept) => dept._id === val._id)) {
-        return [...e, val];
-      }
-    });
+    setError("")
+    setSelectedDirections((old) => old.filter((x) => x !== val));
+    const foundDirection = allDirections.find((d) => d.name === val);
+    setDirections((e) => [...e, foundDirection]);
+    setManageList((list) => list.filter((dept) => dept.direction !== val));
   };
 
   const handleOpen = () => setOpen(true);
@@ -65,14 +76,17 @@ const AddDirector = ({
   const handleSubmit = async (e) => {
     setError("");
     e.preventDefault();
-    if (!email || !manageList.length) {
-      return setError("Please provide all details");
+    if (!email || !manageList.length || !directions.length) {
+      return setError("Please provide all details X");
     }
-    // return
+ 
+   
+
     try {
       const { data } = await axios.post("auth/add_director", {
         email,
         username,
+        directions:JSON.stringify(directions),
         manageList: manageList.map((list) => list._id),
       });
       if (data?.success) {
@@ -85,6 +99,12 @@ const AddDirector = ({
       return setError(error?.response.data.message);
     }
   };
+  useEffect(()=>{
+    if(allDirections){
+      setDirections(allDirections)
+    }
+    // eslint-disable-next-line 
+  },[])
   return (
     <Box sx={{ position: "relative" }}>
       <Button
@@ -144,34 +164,25 @@ const AddDirector = ({
               autoFocus
             />
             <FormControl sx={{ width: "60%", mt: 2 }}>
-              <InputLabel id="Department-id">
-                Select Departments to Manage
-              </InputLabel>
-              <Select
-                labelId="Department-id"
-                id="demo-simple-select"
-                value={""}
-                disabled={!departmentList?.length}
-                label="Department"
-                onChange={handleDepartmentChange}
-              >
-                {departmentList?.map((val) => {
-                  return (
-                    <MenuItem key={val._id + val.name} value={val}>
-                      {val.name.toUpperCase()}
-                    </MenuItem>
-                  );
-                })}
-              </Select>
+              <Autocomplete
+                id="directions"
+                fullWidth
+                value={direction}
+                onChange={handleChangeDirection}
+                options={directions.map((option) => option?.name)}
+                renderInput={(params) => (
+                  <TextField {...params} label="Department Directions" />
+                )}
+              />
               <Typography
                 variant="p"
                 component="div"
                 sx={{ my: 2, display: "flex" }}
               >
-                {manageList.map((val) => (
+                {selectedDirections.map((val, i) => (
                   <Typography
                     varaint="small"
-                    key={val._id}
+                    key={val + i}
                     onClick={() => removeManageDepartment(val)}
                     component="small"
                     sx={{
@@ -188,7 +199,7 @@ const AddDirector = ({
                       },
                     }}
                   >
-                    {val.name}
+                    {val}
                   </Typography>
                 ))}
               </Typography>
@@ -199,6 +210,7 @@ const AddDirector = ({
               type="submit"
               size="large"
               variant="contained"
+              disabled={!manageList.length}
               sx={{ margin: "20px auto", textAlign: "center" }}
             >
               Add Director

@@ -29,7 +29,7 @@ const ComingLicenses = () => {
   const [AllLicenses, setAllLicenses] = useState([]);
 
   const [departmentList, setDepartmentList] = useState([]);
-  const [departmentFilter, setDepartmentFilter] = useState();
+  const [departmentFilter, setDepartmentFilter] = useState("All Directions");
 
   const [suppliers, setSuppliers] = useState([]);
   const [donors, setDonors] = useState([]);
@@ -45,12 +45,20 @@ const ComingLicenses = () => {
     setLimit(event.target.value);
   };
   const handleDepartmentFilter = (event) => {
+    
     setDepartmentFilter(event.target.value);
-    if (event.target.value === "All Departments") {
-      setLicenses(AllLicenses);
+    if (event.target.value === "All Directions") {
+      let data = [];
+      JSON.parse(user.directions).forEach((directionX) => {
+        const filteredLicenses = AllLicenses.filter(
+          (license) => license.department.direction === directionX.name
+        );
+        data = [...data, ...filteredLicenses];
+      });
+      setLicenses(data);
     } else {
       const data = AllLicenses.filter(
-        (license) => license.department._id === event.target.value._id
+        (license) => license.department.direction === event.target.value
       );
       setLicenses(data);
     }
@@ -76,7 +84,14 @@ const ComingLicenses = () => {
           (val) => val.year > new Date().getFullYear()
         );
         setAllLicenses(nextYearLicenses);
-        setLicenses(nextYearLicenses);
+        let datax = [];
+        JSON.parse(user.directions).forEach((directionX) => {
+          const filteredLicenses = nextYearLicenses.filter(
+            (license) => license.department.direction === directionX.name
+          );
+          datax = [...datax, ...filteredLicenses];
+        });
+        setLicenses(datax);
       }
       setLoading(false);
     } catch (error) {
@@ -161,28 +176,27 @@ const ComingLicenses = () => {
       </Typography>
       {user?.role === "director" ? (
           <FormControl
-            size="small"
-            sx={{ width: { md: "20%", xs: "75%" }, mx: 2 }}
+          size="small"
+          sx={{ width: { md: "20%", xs: "75%" }, mx: 2 }}
+        >
+          <InputLabel id="demo-simple2-select-label">Directions</InputLabel>
+          <Select
+            labelId="demo-simple2-select-label"
+            id="demo-simple2-select"
+            value={departmentFilter}
+            defaultValue={"All Directions"}
+            label="Directions"
+            onChange={handleDepartmentFilter}
           >
-            <InputLabel id="demo-simple2-select-label">Department</InputLabel>
-            <Select
-            
-              labelId="demo-simple2-select-label"
-              id="demo-simple2-select"
-              value={departmentFilter}
-              defaultValue="All Departments"
-              label="Department"
-              onChange={handleDepartmentFilter}
-            >
-              <MenuItem value="All Departments">All Departments</MenuItem>
-              {departmentList?.map((dept) => (
-                <MenuItem key={dept._id} value={dept}>
-                  {dept.name}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        ) : null}
+            <MenuItem value="All Directions">All Directions</MenuItem>
+            {JSON.parse(user.directions)?.map((direction) => (
+              <MenuItem key={direction._id} value={direction.name}>
+                {direction.name}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      ) : null}
         </Box>
       {licenses.length ? (
         <>
@@ -202,9 +216,11 @@ const ComingLicenses = () => {
                     Name
                   </TableCell>
                   <TableCell sx={{ fontWeight: "bold", textAlign: "center" }}>
-                    Department
+                    Department Direction
                   </TableCell>
-
+                  <TableCell sx={{ fontWeight: "bold", textAlign: "center" }}>
+                    Department Name
+                  </TableCell>
                   <TableCell sx={{ fontWeight: "bold", textAlign: "center" }}>
                     Description
                   </TableCell>
@@ -265,7 +281,9 @@ const ComingLicenses = () => {
                           val.name.toLowerCase().includes(query) ||
                           val.description.toLowerCase().includes(query) ||
                           val.type.toLowerCase().includes(query) ||
+                          val?.department?.direction.toLowerCase().includes(query)||
                           val?.department?.name.toLowerCase().includes(query)
+
                         ) {
                           returnValue = true;
                         }
@@ -276,6 +294,9 @@ const ComingLicenses = () => {
                           <TableCell sx={{ textAlign: "center" }}>
                             {row.name}
                           </TableCell>
+                          <TableCell sx={{ textAlign: "center" }}>
+                            {row?.department?.direction}
+                          </TableCell> 
                           <TableCell sx={{ textAlign: "center" }}>
                             {row?.department?.name}
                           </TableCell>

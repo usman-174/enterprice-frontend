@@ -27,6 +27,21 @@ const Directors = () => {
   const [searchQ, setSearchQ] = useState("");
   const [limit, setLimit] = useState(10);
   const [departmentList, setDepartmentList] = useState([]);
+  const [directions, setDirections] = useState([]);
+  const fetchDirections = async () => {
+      try {
+        
+        const { data } = await axios.get("directions");
+  
+        if (data?.directions) {
+          setDirections(data?.directions);
+        }
+     
+      } catch (error) {
+        
+      
+      }
+    };
   const handlePagination = (_, page) => {
     setCurrentPage(page);
   };
@@ -71,6 +86,7 @@ const Directors = () => {
   useEffect(() => {
     fetchDirectors();
     fetchDepartments();
+    fetchDirections()
     // eslint-disable-next-line
   }, []);
   if (loading && !directors.length) {
@@ -95,6 +111,7 @@ const Directors = () => {
         fetchUsers={fetchDirectors}
         departmentList={departmentList}
         fetchDepartments={fetchDepartments}
+        allDirections={directions}
         setDepartmentList={setDepartmentList}
       />
       <TableContainer>
@@ -114,6 +131,9 @@ const Directors = () => {
               <TableCell sx={{ fontWeight: "bold" }}>Role</TableCell>
               <TableCell sx={{ fontWeight: "bold" }}>
                 Managing Departments
+              </TableCell>
+              <TableCell sx={{ fontWeight: "bold" }}>
+                Directions
               </TableCell>
               <TableCell sx={{ fontWeight: "bold", textAlign: "center" }}>
                 Action
@@ -155,12 +175,27 @@ const Directors = () => {
                         {list.name}
                       </Typography>
                     ))}
+                    
                   </TableCell>
-
+                  <TableCell>
+                    {row.directions? JSON.parse(row.directions).map((list) => (
+                      <Typography
+                        varaint="small"
+                        key={list._id}
+                        component="small"
+                        sx={{ mx: 1, fontSize: "12px" }}
+                      >
+                        {list.name}
+                      </Typography>
+                    )) : "N/A"}
+                    
+                  </TableCell>
                   <TableCell sx={{ textAlign: "center" }}>
                     <AlertDialog handleDelete={handleDeleteUser} id={row._id} />
                     <UpdateDirector
                       loading={loading}
+                      allDirections={directions}
+
                       departmentList={departmentList}
                       fetchUsers={fetchDirectors}
                      

@@ -142,7 +142,7 @@ const Users = () => {
                   <TableCell>{row.role.toUpperCase()}</TableCell>
                   <TableCell>{row?.seeOnly ? "Read Only" : "Read/Write"}</TableCell>
                   
-                  <TableCell>{row.department?.name}</TableCell>
+                  <TableCell>{row.department?.name ? row.department?.name: "N/A"}</TableCell>
                   <TableCell sx={{ textAlign: "center" }}>
                   <AlertDialog  handleDelete={handleDeleteUser} id={row._id} />
                     <UpdateUser
