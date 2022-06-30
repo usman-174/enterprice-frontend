@@ -3,14 +3,10 @@ import ReactDOM from "react-dom/client";
 import axios from "axios";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
-if (process.env.NODE_ENV === "production") {
-  axios.defaults.baseURL =
-    process.env.API;
-} else {
-  axios.defaults.baseURL = process.env.API||"http://localhost:8000/api";
-}
 console.log({mode:process.env.NODE_ENV});
-axios.defaults.withCredentials = true;
+  axios.defaults.baseURL =process.env.API || "https://enter-price-back.herokuapp.com/api"
+  axios.defaults.withCredentials = true;
+
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
