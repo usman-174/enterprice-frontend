@@ -1,4 +1,5 @@
 import {
+  Autocomplete,
   Checkbox,
   FormControl,
   FormControlLabel,
@@ -18,7 +19,7 @@ const style = {
   top: "50%",
   left: "50%",
   transform: "translate(-50%, -50%)",
-  width: {md : "35%",xs:"90%"},
+  width: { md: "35%", xs: "90%" },
 
   borderRadius: 2,
   bgcolor: "background.paper",
@@ -30,42 +31,52 @@ const style = {
 const AddUser = ({ departmentList, fetchUsers }) => {
   const [open, setOpen] = React.useState(false);
   const [email, setEmail] = React.useState("");
-  
+
   const [username, setUsername] = React.useState("");
-  
+
   const [role, setRole] = React.useState("");
   const [error, setError] = React.useState("");
-  
+  const [selectedDepartment, setSelectedDepartment] = React.useState("");
   const [department, setDepartment] = React.useState("");
-  const handleDepartmentChange = (e) => {
-    setDepartment(e.target.value);
+  const handleDepartmentChange = (e, v) => {
+    if (v?.length) {
+      setSelectedDepartment(v);
+      const result = departmentList.find((x) => x.name === v);
+      if (result) {
+        setDepartment(result._id);
+      }else{
+        setError("Invalid Department")
+      }
+    }
   };
   const [checked, setChecked] = React.useState(false);
   const handleChange = (event) => {
     setChecked(event.target.checked);
-    
   };
-  
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
   const handleSubmit = async (e) => {
     setError("");
     e.preventDefault();
-    if (!email || !department || !role) {
+    if (!email || !role) {
       return setError("Please provide all details");
     }
-    console.log({ email, department, role });
+    if(!department){
+      return setError("Please select a valid Department");
+
+    }
     try {
       const { data } = await axios.post("auth/register", {
         email,
         username,
         role,
         department,
-        seeOnly:checked
+        seeOnly: checked,
       });
       if (data?.success) {
         fetchUsers();
+        e.target.reset()
         return handleClose();
       }
     } catch (error) {
@@ -73,11 +84,11 @@ const AddUser = ({ departmentList, fetchUsers }) => {
     }
   };
   return (
-    <Box sx={{position:"relative"}}>
+    <Box sx={{ position: "relative" }}>
       <Button
         variant="contained"
         onClick={handleOpen}
-        sx={{ margin: {md:"20px 60px"} }}
+        sx={{ margin: { md: "20px 60px" } }}
       >
         Add User
       </Button>
@@ -130,26 +141,7 @@ const AddUser = ({ departmentList, fetchUsers }) => {
               autoComplete="username"
               autoFocus
             />
-            <FormControl sx={{ width: "60%", mt: 2 }}>
-              <InputLabel id="Department-id">Department</InputLabel>
-              <Select
-                labelId="Department-id"
-                id="demo-simple-select"
-                value={department}
-                label="Department"
-                onChange={handleDepartmentChange}
-              >
-                {departmentList?.map((val) => {
-                  return (
-                    <MenuItem key={val._id + val.name} value={val._id}>
-                      {val.name.toUpperCase()}
-                    </MenuItem>
-                  );
-                })}
-              </Select>
-            </FormControl>
-
-            <FormControl sx={{ width: "60%", mt: 2 }}>
+             <FormControl sx={{ width: "60%", mt: 2 }}>
               <InputLabel id="Role-id">Role</InputLabel>
               <Select
                 labelId="Role-id"
@@ -164,7 +156,19 @@ const AddUser = ({ departmentList, fetchUsers }) => {
                 <MenuItem value="user">User</MenuItem>
               </Select>
             </FormControl>
-            <Box sx={{mx:1}}>
+            {role === "user"?<FormControl sx={{ width: "60%", mt: 2 }}>
+              <Autocomplete
+                id="departments"
+                fullWidth
+                value={selectedDepartment}
+                onChange={handleDepartmentChange}
+                options={departmentList?.map((dept) => dept?.name)}
+                renderInput={(params) => (
+                  <TextField {...params} label="Select Department" />
+                )}
+              />
+            </FormControl>:null}       
+           {role ==="user" ?<Box sx={{ mx: 1 }}>
               <FormControlLabel
                 control={
                   <Checkbox
@@ -175,7 +179,7 @@ const AddUser = ({ departmentList, fetchUsers }) => {
                 }
                 label="View Only"
               />
-            </Box>
+            </Box>:null}
             <br />
             <Button
               type="submit"

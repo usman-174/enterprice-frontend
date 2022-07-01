@@ -1,5 +1,6 @@
 import BorderColorIcon from '@mui/icons-material/BorderColor';
 import {
+  Autocomplete,
   Checkbox,
   FormControl,
   FormControlLabel,
@@ -33,6 +34,7 @@ const UpdateUser = ({ user, loading, fetchUsers, departmentList }) => {
   const [open, setOpen] = React.useState(false);
   const [email, setEmail] = React.useState(user?.email || "");
   const [username, setUsername] = React.useState(user?.username || "");
+  const [selectedDepartment, setSelectedDepartment] = React.useState(user?.department?.name || "");
 
   const [role, setRole] = React.useState(user?.role || "");
   const [error, setError] = React.useState("");
@@ -45,8 +47,16 @@ const UpdateUser = ({ user, loading, fetchUsers, departmentList }) => {
     setChecked(event.target.checked);
     
   };
-  const handleDepartmentChange = (e) => {
-    setDepartment(e.target.value);
+  const handleDepartmentChange = (e, v) => {
+    if (v?.length) {
+      setSelectedDepartment(v);
+      const result = departmentList.find((x) => x.name === v);
+      if (result) {
+        setDepartment(result._id);
+      }else{
+        setError("Invalid Department")
+      }
+    }
   };
 
   const handleOpen = () => setOpen(true);
@@ -149,25 +159,6 @@ const UpdateUser = ({ user, loading, fetchUsers, departmentList }) => {
               autoComplete="username"
               autoFocus
             />
-           {user.role !== "admin"? <FormControl sx={{ width: "60%", mt: 2 }}>
-              <InputLabel id="Department-id">Department</InputLabel>
-              <Select
-                labelId="Department-id"
-                id="demo-simple-select"
-                value={department}
-                label="Department"
-                onChange={handleDepartmentChange}
-              >
-                {departmentList?.map((val) => {
-                  return (
-                    <MenuItem key={val._id + val.name} value={val._id}>
-                      {val.name.toUpperCase()}
-                    </MenuItem>
-                  );
-                })}
-              </Select>
-            </FormControl>:null}
-
             <FormControl sx={{ width: "60%", mt: 2 }}>
               <InputLabel id="Role-id">Role</InputLabel>
               <Select
@@ -183,7 +174,19 @@ const UpdateUser = ({ user, loading, fetchUsers, departmentList }) => {
                 <MenuItem value="user">User</MenuItem>
               </Select>
             </FormControl>
-           {user.role !== "admin"? <Box sx={{mx:1}}>
+            {role === "user"?<FormControl sx={{ width: "60%", mt: 2 }}>
+              <Autocomplete
+                id="departments"
+                fullWidth
+                value={selectedDepartment}
+                onChange={handleDepartmentChange}
+                options={departmentList?.map((dept) => dept?.name)}
+                renderInput={(params) => (
+                  <TextField {...params} label="Select Department" />
+                )}
+              />
+            </FormControl>:null}       
+           {role ==="user" ?<Box sx={{ mx: 1 }}>
               <FormControlLabel
                 control={
                   <Checkbox
@@ -194,7 +197,7 @@ const UpdateUser = ({ user, loading, fetchUsers, departmentList }) => {
                 }
                 label="View Only"
               />
-            </Box> : null}
+            </Box>:null}
             <br />
             <Button
               type="submit"

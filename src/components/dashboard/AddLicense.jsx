@@ -1,4 +1,5 @@
 import {
+  Autocomplete,
   Checkbox,
   Drawer,
   FormControl,
@@ -47,6 +48,21 @@ const AddLicense = ({
   const [error, setError] = React.useState("");
 
   const [department, setDepartment] = React.useState("");
+  const [selectedDepartment, setSelectedDepartment] = React.useState("");
+
+  const handleDepartmentChange = (e, v) => {
+    if (v?.length) {
+      setSelectedDepartment(v);
+      const result = departmentList.find((x) => x.name === v);
+      if (result) {
+        setDepartment(result._id)
+      }else{
+        setError("Invalid Department")
+      }
+    }
+  };
+  
+
   const handleChange = (event) => {
     setChecked(event.target.checked);
     if (event.target.checked) {
@@ -73,13 +89,16 @@ const AddLicense = ({
       !validityTime ||
       !supportTime ||
       !amount ||
-      !donor ||
       !supplier ||
       !supplierContact ||
       !lempirasPrice ||
       !year
     ) {
       return setError("Please provide all details");
+    }
+    if(sourceOfFund === "donation" && !donor){
+      return setError("Please select a Donor");
+
     }
     // return
     try {
@@ -365,7 +384,6 @@ const AddLicense = ({
               </FormControl>
             </Box>
 
-        
             <Box
               component="div"
               display={"flex"}
@@ -376,28 +394,21 @@ const AddLicense = ({
                 my: 2,
               }}
             >
-              {/* Department Select */}
               <FormControl
                 sx={{
-                  width: "40%",
+                  width: "43%",
                 }}
               >
-                <InputLabel id="Department-id">Department</InputLabel>
-                <Select
-                  labelId="Department-id"
-                  id="demo-simple-select"
-                  value={department}
-                  label="Department"
-                  onChange={(e) => setDepartment(e.target.value)}
-                >
-                  {departmentList?.map((val) => {
-                    return (
-                      <MenuItem key={val._id + val.name} value={val._id}>
-                        {val.name.toUpperCase()}
-                      </MenuItem>
-                    );
-                  })}
-                </Select>
+                <Autocomplete
+                  id="departments"
+                  fullWidth
+                  value={selectedDepartment}
+                  onChange={handleDepartmentChange}
+                  options={departmentList?.map((dept) => dept?.name)}
+                  renderInput={(params) => (
+                    <TextField {...params} label="Select Department" />
+                  )}
+                />
               </FormControl>
               <FormControl
                 sx={{

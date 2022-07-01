@@ -121,7 +121,7 @@ const UpdateDirector = ({
       setDirections(allDirections);
     }
     // eslint-disable-next-line
-  }, []);
+  }, [allDirections]);
 
   return (
     <>

@@ -1,5 +1,6 @@
 import BorderColorIcon from "@mui/icons-material/BorderColor";
 import {
+  Autocomplete,
   FormControl,
   FormHelperText,
   IconButton,
@@ -17,7 +18,14 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import axios from "axios";
 import React, { useState } from "react";
 
-const UpdateLicense = ({ loading, fetchLicenses, license, departmentList,donors,suppliers }) => {
+const UpdateLicense = ({
+  loading,
+  fetchLicenses,
+  license,
+  departmentList,
+  donors,
+  suppliers,
+}) => {
   const [isOpen, setIsOpen] = useState(false);
   const [description, setDescription] = React.useState(
     license?.description || ""
@@ -27,7 +35,9 @@ const UpdateLicense = ({ loading, fetchLicenses, license, departmentList,donors,
   );
 
   const [name, setName] = React.useState(license?.name || "");
-  const [firstDate, setFirstDate] = React.useState(license?.firstDate || Date.now());
+  const [firstDate, setFirstDate] = React.useState(
+    license?.firstDate || Date.now()
+  );
 
   const [amount, setAmount] = React.useState(license?.amount || 0);
   const [supportTime, setSupportTime] = React.useState(
@@ -54,6 +64,20 @@ const UpdateLicense = ({ loading, fetchLicenses, license, departmentList,donors,
   const [department, setDepartment] = React.useState(
     license?.department._id || ""
   );
+  const [selectedDepartment, setSelectedDepartment] = React.useState(
+    license?.department.name || ""
+  );
+  const handleDepartmentChange = (e, v) => {
+    if (v?.length) {
+      setSelectedDepartment(v);
+      const result = departmentList.find((x) => x.name === v);
+      if (result) {
+        setDepartment(result._id);
+      } else {
+        setError("Invalid Department");
+      }
+    }
+  };
 
   const handleOpen = () => setIsOpen(true);
   const handleClose = () => setIsOpen(false);
@@ -98,7 +122,7 @@ const UpdateLicense = ({ loading, fetchLicenses, license, departmentList,donors,
     if (department && department !== license.department) {
       fields.department = department;
     }
-    if (donor && donor !== license.donor) {
+    if (sourceOfFund === "donation" && donor && donor !== license.donor) {
       fields.donor = donor;
     }
     if (url && url !== license.url) {
@@ -273,7 +297,7 @@ const UpdateLicense = ({ loading, fetchLicenses, license, departmentList,donors,
                 autoFocus
               />
             </Box>
-         
+
             <Box
               component="div"
               sx={{
@@ -318,7 +342,7 @@ const UpdateLicense = ({ loading, fetchLicenses, license, departmentList,donors,
                 </Select>
               </FormControl>
             </Box>
-           
+
             <Box
               sx={{
                 display: "flex",
@@ -385,7 +409,7 @@ const UpdateLicense = ({ loading, fetchLicenses, license, departmentList,donors,
               }}
             >
               {/* Department Select */}
-              <FormControl
+              {/* <FormControl
                 sx={{
                   width: "40%",
                 }}
@@ -406,6 +430,22 @@ const UpdateLicense = ({ loading, fetchLicenses, license, departmentList,donors,
                     );
                   })}
                 </Select>
+              </FormControl> */}
+              <FormControl
+                sx={{
+                  width: "43%",
+                }}
+              >
+                <Autocomplete
+                  id="departments"
+                  fullWidth
+                  value={selectedDepartment}
+                  onChange={handleDepartmentChange}
+                  options={departmentList?.map((dept) => dept?.name)}
+                  renderInput={(params) => (
+                    <TextField {...params} label="Select Department" />
+                  )}
+                />
               </FormControl>
               <FormControl
                 sx={{
