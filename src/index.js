@@ -4,8 +4,9 @@ import axios from "axios";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 console.log({mode:process.env.NODE_ENV});
-  axios.defaults.baseURL =process.env.API ||"https://enter-price-back.herokuapp.com/api"
-  
+  axios.defaults.baseURL =process.env.API ||
+  "https://enter-price-back.herokuapp.com/api"
+  // "http://localhost:8000/api"
   // "https://enter-price-back.herokuapp.com/api"
   axios.defaults.withCredentials = true;
 

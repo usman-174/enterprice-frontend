@@ -28,11 +28,17 @@ const Directors = () => {
   const [limit, setLimit] = useState(10);
   const [departmentList, setDepartmentList] = useState([]);
   const [directions, setDirections] = useState([]);
+  console.log({directions});
   const fetchDirections = async () => {
-    const { data } = await axios.get("directions");
-
+    try {
+      const { data } = await axios.get("directions");
+      
     if (data?.directions) {
       setDirections(data?.directions);
+    }
+    } catch (error) {
+      setDirections([]);
+      
     }
   };
   const handlePagination = (_, page) => {
