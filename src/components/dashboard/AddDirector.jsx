@@ -40,7 +40,7 @@ const AddDirector = ({
   const [manageList, setManageList] = React.useState([]);
   const [direction, setDirection] = React.useState("");
   const [directions, setDirections] = React.useState(allDirections || []);
-
+  console.log({directions});
   const [department, setDepartment] = React.useState("");
   const [departments, setDepartments] = React.useState([]);
 
@@ -171,7 +171,7 @@ const AddDirector = ({
                 fullWidth
                 value={direction}
                 onChange={handleChangeDirection}
-                options={directions.map((option) => option?.name)}
+                options={directions?.map((option) => option?.name)}
                 renderInput={(params) => (
                   <TextField {...params} label="Department Directions" />
                 )}
