@@ -34,9 +34,11 @@ const Directors = () => {
       const { data } = await axios.get("directions");
       
     if (data?.directions) {
+      console.log("Setting Directions");
       setDirections(data?.directions);
     }
     } catch (error) {
+
       setDirections([]);
       
     }

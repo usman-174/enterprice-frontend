@@ -40,7 +40,7 @@ const AddDirector = ({
   const [manageList, setManageList] = React.useState([]);
   const [direction, setDirection] = React.useState("");
   const [directions, setDirections] = React.useState(allDirections || []);
-  console.log({directions});
+  console.log({directions,allDirections});
   const [department, setDepartment] = React.useState("");
   const [departments, setDepartments] = React.useState([]);
 
