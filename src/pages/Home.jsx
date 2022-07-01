@@ -46,7 +46,7 @@ const Home = () => {
   const handleDepartmentFilter = (event) => {
     setDepartmentFilter(event.target.value);
     if (event.target.value === "All Departments") {
-      console.log("WORKING");
+     
       let data = [];
       user.manageList.forEach((dept) => {
         const filteredLicenses = AllLicenses.filter(

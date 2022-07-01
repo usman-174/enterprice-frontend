@@ -28,7 +28,7 @@ const Directors = () => {
   const [limit, setLimit] = useState(10);
   const [departmentList, setDepartmentList] = useState([]);
   const [directions, setDirections] = useState([]);
-  console.log({directions});
+
   const fetchDirections = async () => {
     try {
       const { data } = await axios.get("directions");
