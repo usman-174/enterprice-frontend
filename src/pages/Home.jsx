@@ -44,7 +44,6 @@ const Home = () => {
     setLimit(event.target.value);
   };
   const handleDepartmentFilter = (event) => {
-    console.log("-----------" , event.target.value);
     setDepartmentFilter(event.target.value);
     if (event.target.value === "All Departments") {
       console.log("WORKING");
@@ -154,7 +153,7 @@ const Home = () => {
         ) : null}
       </Box>
 
-      {user.role !== "director" ? (
+      {user?.role !== "director" ? (
         <AddLicense
           fetchLicenses={fetchLicenses}
           departmentList={departmentList}
@@ -197,7 +196,7 @@ const Home = () => {
               onChange={handleDepartmentFilter}
             >
               <MenuItem value={"All Departments"}>All Departments</MenuItem>
-              {user.manageList.map((dept) => (
+              {user?.manageList.map((dept) => (
                 <MenuItem key={dept._id} value={dept.name}>
                   {dept.name}
                 </MenuItem>

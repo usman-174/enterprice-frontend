@@ -39,7 +39,8 @@ const AddDirector = ({
   const [username, setUsername] = React.useState("");
   const [manageList, setManageList] = React.useState([]);
   const [direction, setDirection] = React.useState("");
-  const [directions, setDirections] = React.useState(allDirections);
+  const [directions, setDirections] = React.useState(allDirections || []);
+
   const [department, setDepartment] = React.useState("");
   const [departments, setDepartments] = React.useState([]);
 
@@ -103,9 +104,7 @@ const AddDirector = ({
     }
   };
   useEffect(() => {
-    if (allDirections) {
       setDirections(allDirections);
-    }
     // eslint-disable-next-line
   }, []);
   return (
