@@ -1,4 +1,4 @@
-import { Box, TableContainer, TablePagination, TextField } from "@mui/material";
+import { Box, TableContainer, TablePagination, TextField, Typography } from "@mui/material";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import logo from "../../assests/logo.png";
@@ -7,6 +7,8 @@ import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
 import TableHead from "@mui/material/TableHead";
+import { toast } from "react-toastify";
+
 import TableRow from "@mui/material/TableRow";
 import moment from "moment";
 import AlertDialog from "../../components/AlertDialog";
@@ -18,24 +20,18 @@ const Departments = () => {
 
   const [currentPage, setCurrentPage] = useState(0);
 
-
   const [searchQ, setSearchQ] = useState("");
   const [limit, setLimit] = useState(10);
   const [directions, setDirections] = useState([]);
   const fetchDirections = async () => {
-      try {
-        
-        const { data } = await axios.get("directions");
-  
-        if (data?.directions) {
-          setDirections(data?.directions);
-        }
-     
-      } catch (error) {
-        
-      
+    try {
+      const { data } = await axios.get("directions");
+
+      if (data?.directions) {
+        setDirections(data?.directions);
       }
-    };
+    } catch (error) {}
+  };
   const handlePagination = (_, page) => {
     setCurrentPage(page);
   };
@@ -45,13 +41,21 @@ const Departments = () => {
   };
   const handleDeleteDepartments = async (id) => {
     try {
-      console.log("Deleting Department");
       const { data } = await axios.delete(`/departments/${id}`);
       if (data?.success) {
         fetchDepartments();
       }
     } catch (error) {
-      alert(error?.response.data.message);
+      toast.error(
+        error?.response.data.message || "Failed to Delete the department",
+        {
+          position: "top-right",
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+        }
+      );
     }
   };
   const fetchDepartments = async () => {
@@ -64,15 +68,20 @@ const Departments = () => {
       }
       setLoading(false);
     } catch (error) {
-      alert(error?.response.data.message);
+      toast.error("Failed to load Departments", {
+        position: "top-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+      });
       setLoading(false);
     }
   };
- 
 
   useEffect(() => {
     fetchDepartments();
-    fetchDirections()
+    fetchDirections();
     // eslint-disable-next-line
   }, []);
   if (loading && !departments.length) {
@@ -94,7 +103,7 @@ const Departments = () => {
         ) : null}
       </Box>
       <AddDepartment
-       directions={directions}
+        directions={directions}
         fetchDepartments={fetchDepartments}
       />
       <TableContainer>
@@ -142,9 +151,13 @@ const Departments = () => {
                 <TableRow key={row._id}>
                   <TableCell>{row._id}</TableCell>
 
-                  <TableCell>{row.name}</TableCell>
+                  <TableCell>
+                    <ReadMore limit="70">{row.name}</ReadMore>
+                  </TableCell>
                   <TableCell>{row?.direction || "N/A"}</TableCell>
-                  <TableCell>{row.description}</TableCell>
+                  <TableCell>
+                    <ReadMore limit="130">{row.description}</ReadMore>
+                  </TableCell>
                   <TableCell>
                     {moment(row.createdAt).format("MM/DD/YYYY")}
                   </TableCell>
@@ -180,5 +193,31 @@ const Departments = () => {
     </Box>
   );
 };
+function ReadMore({ children, limit = 150 }) {
+  const text = children;
 
+  const [isShow, setIsShowLess] = useState(true);
+  const result = isShow ? text.slice(0, limit) : text;
+  const isLonger = text.length > limit;
+
+  function toggleIsShow() {
+    setIsShowLess(!isShow);
+  }
+
+  return (
+    <p>
+      {result}
+      {isLonger ? (
+        <Typography
+          component="span"
+          variant="subtitle2"
+          sx={{ color: "blue", cursor: "pointer" }}
+          onClick={toggleIsShow}
+        >
+          {isShow ? "  Read More" : "  Read Less"}
+        </Typography>
+      ) : null}
+    </p>
+  );
+}
 export default Departments;

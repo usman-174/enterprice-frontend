@@ -13,6 +13,7 @@ import logo from "../../assests/logo.png";
 import AlertDialog from "../../components/AlertDialog";
 import EditDonor from "../../components/dashboard/EditDonors"
 import AddDonor from "../../components/dashboard/AddDonor";
+import { toast } from "react-toastify";
 
 const Donors = () => {
   const [loading, setLoading] = useState(true);
@@ -38,7 +39,14 @@ const Donors = () => {
       }
       setLoading(false);
     } catch (error) {
-      alert(error?.response.data.message);
+      toast.error("Failed to load Donors", {
+        position: "top-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+      });
+    
       setLoading(false);
     }
   };
@@ -50,7 +58,16 @@ const Donors = () => {
         return fetchDonors();
       }
     } catch (error) {
-      alert("Failed to delete the Supplier");
+      toast.error(
+        error?.response.data.message || "Failed to Delete the Donor",
+        {
+          position: "top-right",
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+        }
+      );
     }
   };
   useEffect(() => {

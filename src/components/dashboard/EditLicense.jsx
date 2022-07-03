@@ -146,7 +146,6 @@ const UpdateLicense = ({
         }
       }
     } catch (error) {
-      console.log(error.message);
       return setError(error?.response.data.message);
     }
   };
@@ -386,7 +385,6 @@ const UpdateLicense = ({
                     <MenuItem
                       key={val._id}
                       onClick={() => {
-                        console.log("Setting url and contact");
                         setUrl(val?.url || "URl" + val._id);
                         setSupplierContact(val?.contact || "Contact" + val._id);
                       }}
@@ -408,29 +406,6 @@ const UpdateLicense = ({
                 my: 2,
               }}
             >
-              {/* Department Select */}
-              {/* <FormControl
-                sx={{
-                  width: "40%",
-                }}
-              >
-                <InputLabel id="Department-id">Department</InputLabel>
-                <Select
-                  labelId="Department-id"
-                  id="demo-simple-select"
-                  value={department}
-                  label="Department"
-                  onChange={(e) => setDepartment(e.target.value)}
-                >
-                  {departmentList?.map((val) => {
-                    return (
-                      <MenuItem key={val._id + val.name} value={val._id}>
-                        {val.name.toUpperCase()}
-                      </MenuItem>
-                    );
-                  })}
-                </Select>
-              </FormControl> */}
               <FormControl
                 sx={{
                   width: "43%",
@@ -457,7 +432,7 @@ const UpdateLicense = ({
                     label="First Date"
                     inputFormat="MM/dd/yyyy"
                     value={firstDate}
-                    // minDate={Date.now()}
+                  
                     disabled={license?.year > new Date().getFullYear()}
                     onChange={(e) => setFirstDate(e)}
                     renderInput={(params) => <TextField {...params} />}

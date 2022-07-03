@@ -6,6 +6,7 @@ import {
   TableContainer,
   TablePagination,
   TextField,
+  Typography,
 } from "@mui/material";
 
 import Table from "@mui/material/Table";
@@ -13,7 +14,7 @@ import axios from "axios";
 import moment from "moment";
 import { useEffect, useState } from "react";
 import logo from "../../assests/logo.png";
-
+// import ShowMoreText from "react-show-more-text";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
 import TableHead from "@mui/material/TableHead";
@@ -21,6 +22,7 @@ import TableRow from "@mui/material/TableRow";
 import AlertDialog from "../../components/AlertDialog";
 import AddLicense from "../../components/dashboard/AddLicense";
 import UpdateLicense from "../../components/dashboard/EditLicense";
+import { toast } from "react-toastify";
 
 const Licenses = () => {
   const [loading, setLoading] = useState(true);
@@ -61,7 +63,14 @@ const Licenses = () => {
       }
       setLoading(false);
     } catch (error) {
-      alert(error?.response.data.message);
+      toast.error("Failed to load the Licenses", {
+        position: "top-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+      });
+      setLoading(false);
       setLoading(false);
     }
   };
@@ -72,7 +81,16 @@ const Licenses = () => {
         return fetchLicenses();
       }
     } catch (error) {
-      alert("Failed to delete the user");
+      toast.error(
+        error?.response.data.message || "Failed to Delete the License",
+        {
+          position: "top-right",
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+        }
+      );
     }
   };
   const fetchDepartments = async () => {
@@ -93,7 +111,7 @@ const Licenses = () => {
         setDonors(data?.donors);
       }
     } catch (error) {
-      console.log(error?.response.data.message);
+      console.error(error?.response.data.message);
     }
   };
   const fetchSupplier = async () => {
@@ -104,7 +122,7 @@ const Licenses = () => {
         setSuppliers(data?.suppliers);
       }
     } catch (error) {
-      console.log(error?.response.data.message);
+      console.error(error?.response.data.message);
     }
   };
   useEffect(() => {
@@ -119,7 +137,7 @@ const Licenses = () => {
         );
       }
     }
-  }, [setShowFutureLicenses,AllLicenses,showFutureLicenses]);
+  }, [setShowFutureLicenses, AllLicenses, showFutureLicenses]);
   useEffect(() => {
     fetchLicenses();
     fetchDepartments();
@@ -152,7 +170,7 @@ const Licenses = () => {
         suppliers={suppliers}
         loading={loading}
       />
-      <FormGroup sx={{ml:5}}>
+      <FormGroup sx={{ ml: 5 }}>
         <FormControlLabel
           control={
             <Checkbox
@@ -163,7 +181,7 @@ const Licenses = () => {
           label="Show Future Licenses"
         />
       </FormGroup>
-      <TableContainer >
+      <TableContainer>
         <Table
           size="small"
           sx={{
@@ -255,14 +273,14 @@ const Licenses = () => {
                   .map((row) => (
                     <TableRow key={row._id}>
                       <TableCell sx={{ textAlign: "center" }}>
-                        {row.name}
+                        <ReadMore limit={0}>{row?.name}</ReadMore>
                       </TableCell>
                       <TableCell sx={{ textAlign: "center" }}>
                         {row?.department?.name}
                       </TableCell>
 
                       <TableCell sx={{ textAlign: "center" }}>
-                        {row.description}
+                        <ReadMore limit={150}>{row.description}</ReadMore>
                       </TableCell>
                       <TableCell sx={{ textAlign: "center" }}>
                         {row.type}
@@ -275,7 +293,9 @@ const Licenses = () => {
                       </TableCell>
                       <TableCell sx={{ textAlign: "center" }}>
                         {row.firstDate
-                          ? row.daysTillValidityExpiry + " days"
+                          ? row.daysTillValidityExpiry > 0
+                            ? row.daysTillValidityExpiry + " days"
+                            : "EXPIRED"
                           : "N/A"}
                       </TableCell>
 
@@ -284,7 +304,9 @@ const Licenses = () => {
                       </TableCell>
                       <TableCell sx={{ textAlign: "center" }}>
                         {row.firstDate
-                          ? row.daysTillSupportExpiry + " days"
+                          ? row.daysTillSupportExpiry > 0
+                            ? row.daysTillSupportExpiry + " days"
+                            : "EXPIRED"
                           : "N/A"}
                       </TableCell>
 
@@ -345,5 +367,32 @@ const Licenses = () => {
     </Box>
   );
 };
+function ReadMore({ children,limit=150 }) {
+  const text = children;
+
+  const [isShow, setIsShowLess] = useState(true);
+  const result = isShow ? text.slice(0, limit) : text;
+  const isLonger = text.length > limit;
+
+  function toggleIsShow() {
+    setIsShowLess(!isShow);
+  }
+
+  return (
+    <p>
+      {result}
+      {isLonger ? (
+        <Typography
+          component="span"
+          variant="subtitle2"
+          sx={{ color: "blue", cursor: "pointer" }}
+          onClick={toggleIsShow}
+        >
+          {isShow ? "  Read More" : "  Read Less"}
+        </Typography>
+      ) : null}
+    </p>
+  );
+}
 
 export default Licenses;

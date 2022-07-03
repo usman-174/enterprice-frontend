@@ -48,7 +48,6 @@ const EditDirection = ({ loading, fetchDirections, direction }) => {
         }
       }
     } catch (error) {
-      console.log(error?.message);
       return setError(error?.response.data.message);
     }
   };

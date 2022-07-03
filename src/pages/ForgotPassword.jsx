@@ -54,7 +54,6 @@ export default function ForgotPassword() {
       }
     } catch (error) {
       setError(error?.response.data.message);
-      console.log(error?.message + "SHit");
     }
     setLoading(false);
   };

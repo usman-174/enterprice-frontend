@@ -13,6 +13,7 @@ import logo from "../../assests/logo.png";
 import AlertDialog from "../../components/AlertDialog";
 import AddSupplier from "../../components/dashboard/AddSupplier";
 import EditSupplier from "../../components/dashboard/EditSuppliers";
+import { toast } from "react-toastify";
 const Suppliers = () => {
   const [loading, setLoading] = useState(true);
   const [suppliers, setSuppliers] = useState([]);
@@ -37,7 +38,13 @@ const Suppliers = () => {
       }
       setLoading(false);
     } catch (error) {
-      alert(error?.response.data.message);
+      toast.error("Failed to load the Suppliers", {
+        position: "top-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+      });
       setLoading(false);
     }
   };
@@ -49,7 +56,16 @@ const Suppliers = () => {
         return fetchSuppliers();
       }
     } catch (error) {
-      alert("Failed to delete the Supplier");
+      toast.error(
+        error?.response.data.message || "Failed to Delete the Supplier",
+        {
+          position: "top-right",
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+        }
+      );
     }
   };
   useEffect(() => {

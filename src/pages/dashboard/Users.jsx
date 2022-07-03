@@ -17,6 +17,7 @@ import logo from "../../assests/logo.png";
 import AlertDialog from "../../components/AlertDialog";
 import AddUser from "../../components/dashboard/AddUser";
 import UpdateUser from "../../components/dashboard/EditUser";
+import { toast } from "react-toastify";
 
 const Users = () => {
   const [loading, setLoading] = useState(true);
@@ -45,7 +46,13 @@ const Users = () => {
       }
       setLoading(false);
     } catch (error) {
-      alert(error?.response.data.message);
+      toast.error("Failed to load the Users", {
+        position: "top-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+      });
       setLoading(false);
     }
   };
@@ -66,7 +73,16 @@ const Users = () => {
         return fetchUsers();
       }
     } catch (error) {
-      alert("Failed to delete the user");
+      toast.error(
+        error?.response.data.message || "Failed to Delete the User",
+        {
+          position: "top-right",
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+        }
+      );
     }
   };
   useEffect(() => {

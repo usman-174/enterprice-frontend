@@ -62,7 +62,6 @@ const UpdateDepartment = ({  loading,fetchDepartments ,department,directions}) =
           }
       }
     } catch (error) {
-        console.log(error.message);
       return setError(error?.response.data.message);
     }
   };

@@ -60,7 +60,6 @@ const UpdateDirector = ({
     setDirection(v);
     const departmentsx = departmentList.filter((dept) => dept.direction === v);
     const res = departmentsx.filter(dept=>!manageList.find(x=>x._id===dept._id))
-    console.log({ departmentsx, manageList, res });
    
       setDepartments(res);
     
@@ -112,7 +111,6 @@ const UpdateDirector = ({
         }
       }
     } catch (error) {
-      console.log(error.message);
       return setError(error?.response.data.message);
     }
   };

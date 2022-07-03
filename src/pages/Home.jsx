@@ -23,6 +23,8 @@ import TableRow from "@mui/material/TableRow";
 import AddLicense from "../components/dashboard/AddLicense";
 import UpdateLicense from "../components/dashboard/EditLicense";
 import { useUser } from "../Store";
+import { toast } from "react-toastify";
+
 const Home = () => {
   const { user } = useUser();
   const [loading, setLoading] = useState(true);
@@ -96,9 +98,13 @@ const Home = () => {
       }
       setLoading(false);
     } catch (error) {
-      alert(error?.message);
-
-      alert(error?.response.data.message);
+      toast.error("Failed to load Licenses", {
+        position: "top-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+      });
       setLoading(false);
     }
   };
@@ -110,7 +116,7 @@ const Home = () => {
         setDonors(data?.donors);
       }
     } catch (error) {
-      console.log(error?.response.data.message);
+      console.error(error?.response.data.message);
     }
   };
   const fetchSupplier = async () => {
@@ -121,7 +127,7 @@ const Home = () => {
         setSuppliers(data?.suppliers);
       }
     } catch (error) {
-      console.log(error?.response.data.message);
+      console.error(error?.response.data.message);
     }
   };
   useEffect(() => {

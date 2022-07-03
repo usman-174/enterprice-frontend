@@ -90,7 +90,6 @@ const UpdateUser = ({ user, loading, fetchUsers, departmentList }) => {
       fields.seeOnly = checked;
     }
      
-    console.log(fields);
     try {
       const { data } = await axios.put(`auth/${user._id}`, fields);
       if (data?.success) {
@@ -100,7 +99,6 @@ const UpdateUser = ({ user, loading, fetchUsers, departmentList }) => {
         }
       }
     } catch (error) {
-      console.log(error.message);
       return setError(error?.response.data.message);
     }
   };

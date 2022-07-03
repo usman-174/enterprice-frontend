@@ -7,6 +7,7 @@ import {
 } from "@mui/material";
 import axios from "axios";
 import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 
 import Table from "@mui/material/Table";
 
@@ -58,7 +59,13 @@ const Directors = () => {
       }
       setLoading(false);
     } catch (error) {
-      alert(error?.response.data.message);
+      toast.error("Failed to load Directors", {
+        position: "top-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+      });
       setLoading(false);
     }
   };
@@ -79,7 +86,16 @@ const Directors = () => {
         return fetchDirectors();
       }
     } catch (error) {
-      alert("Failed to delete the user");
+      toast.error(
+        error?.response.data.message || "Failed to Delete the Director",
+        {
+          position: "top-right",
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+        }
+      );
     }
   };
   useEffect(() => {

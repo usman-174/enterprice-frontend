@@ -127,7 +127,6 @@ const AddLicense = ({
         return handleClose();
       }
     } catch (error) {
-      alert(error?.message);
       return setError(error?.response.data.message);
     }
   };
@@ -371,7 +370,6 @@ const AddLicense = ({
                     <MenuItem
                       key={val._id}
                       onClick={() => {
-                        console.log("Setting url and contact");
                         setUrl(val?.url || "URl" + val._id);
                         setSupplierContact(val?.contact || "Contact" + val._id);
                       }}
@@ -421,7 +419,7 @@ const AddLicense = ({
                     inputFormat="MM/dd/yyyy"
                     value={firstDate}
                     disabled={checked}
-                    minDate={Date.now()}
+                   
                     onChange={(e) => setFirstDate(e)}
                     renderInput={(params) => <TextField {...params} />}
                   />

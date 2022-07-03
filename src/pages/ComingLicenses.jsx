@@ -2,6 +2,7 @@ import Table from "@mui/material/Table";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import logo from "../assests/logo.png";
+import { toast } from "react-toastify";
 
 import {
   Box,
@@ -45,10 +46,8 @@ const ComingLicenses = () => {
     setLimit(event.target.value);
   };
   const handleDepartmentFilter = (event) => {
-    console.log("-----------" , event.target.value);
     setDepartmentFilter(event.target.value);
     if (event.target.value === "All Departments") {
-      console.log("WORKING");
       let data = [];
       user.manageList.forEach((dept) => {
         const filteredLicenses = AllLicenses.filter(
@@ -97,9 +96,13 @@ const ComingLicenses = () => {
       }
       setLoading(false);
     } catch (error) {
-      alert(error?.message);
-
-      alert(error?.response.data.message);
+      toast.error("Failed to load Licenses", {
+        position: "top-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+      });
       setLoading(false);
     }
   };
@@ -112,7 +115,7 @@ const ComingLicenses = () => {
         setDonors(data?.donors);
       }
     } catch (error) {
-      console.log(error?.response.data.message);
+      console.error(error?.response.data.message);
     }
   };
   const fetchSupplier = async () => {
@@ -123,7 +126,7 @@ const ComingLicenses = () => {
         setSuppliers(data?.suppliers);
       }
     } catch (error) {
-      console.log(error?.response.data.message);
+      console.error(error?.response.data.message);
     }
   };
   useEffect(() => {

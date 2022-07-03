@@ -1,6 +1,7 @@
 import { Box, TableContainer, TablePagination, TextField } from "@mui/material";
 import axios from "axios";
 import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 
 import Table from "@mui/material/Table";
 
@@ -38,7 +39,13 @@ const Directions = () => {
       }
       setLoading(false);
     } catch (error) {
-      alert(error?.response.data.message);
+      toast.error("Failed to load Directions", {
+        position: "top-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+      });
       setLoading(false);
     }
   };
@@ -50,7 +57,16 @@ const Directions = () => {
         return fetchDirections();
       }
     } catch (error) {
-      alert("Failed to delete the Supplier");
+      toast.error(
+        error?.response.data.message || "Failed to delete the Supplier",
+        {
+          position: "top-right",
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+        }
+      );
     }
   };
   useEffect(() => {

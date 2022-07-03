@@ -59,7 +59,6 @@ const EditSupplier = ({ loading, fetchSuppliers, supplier }) => {
         }
       }
     } catch (error) {
-      console.log(error.message);
       return setError(error?.response.data.message);
     }
   };

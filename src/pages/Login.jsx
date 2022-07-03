@@ -63,7 +63,6 @@ const { state } = useLocation();
       }
     } catch (error) {
       setError(error?.response.data.message);
-      console.log(error?.message);
       setLoading(false);
     }
   };
