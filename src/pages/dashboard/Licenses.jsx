@@ -273,7 +273,7 @@ const Licenses = () => {
                   .map((row) => (
                     <TableRow key={row._id}>
                       <TableCell sx={{ textAlign: "center" }}>
-                        <ReadMore limit={0}>{row?.name}</ReadMore>
+                        <ReadMore limit={40}>{row?.name}</ReadMore>
                       </TableCell>
                       <TableCell sx={{ textAlign: "center" }}>
                         {row?.department?.name}
@@ -367,7 +367,7 @@ const Licenses = () => {
     </Box>
   );
 };
-function ReadMore({ children,limit=150 }) {
+function ReadMore({ children,limit }) {
   const text = children;
 
   const [isShow, setIsShowLess] = useState(true);
