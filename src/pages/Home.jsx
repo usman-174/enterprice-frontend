@@ -28,6 +28,7 @@ import { toast } from "react-toastify";
 const Home = () => {
   const { user } = useUser();
   const [loading, setLoading] = useState(true);
+  const isDirector = user.role === "director";
   const [licenses, setLicenses] = useState([]);
   const [AllLicenses, setAllLicenses] = useState([]);
   const [departmentList, setDepartmentList] = useState([]);
@@ -48,20 +49,27 @@ const Home = () => {
   const handleDepartmentFilter = (event) => {
     setDepartmentFilter(event.target.value);
     if (event.target.value === "All Departments") {
-     
       let data = [];
-      user.manageList.forEach((dept) => {
-        const filteredLicenses = AllLicenses.filter(
-          (license) => license.department._id === dept._id
-        );
-        data = [...data,...filteredLicenses];
-      });
+      if (isDirector) {
+        user.manageList.forEach((dept) => {
+          const filteredLicenses = AllLicenses.filter(
+            (license) => license.department._id === dept._id
+          );
+          data = [...data, ...filteredLicenses];
+        });
+      } 
       setLicenses(data);
     } else {
-      const foundDept = departmentList.find(x=>x.name ===event.target.value)
-      const data = AllLicenses.filter(
-        (license) => license.department._id === foundDept._id
-      );
+      let data = [];
+      if (isDirector) {
+        const foundDept = departmentList.find(
+          (x) => x.name === event.target.value
+        );
+        data = AllLicenses.filter(
+          (license) => license.department._id === foundDept._id
+        );
+      } 
+
       setLicenses(data);
     }
   };
@@ -82,19 +90,24 @@ const Home = () => {
       const { data } = await axios.get("licenses");
 
       if (data?.licenses) {
-        const thisYearLicenses = data?.licenses.filter(
-          (val) => val.year <= new Date().getFullYear()
-        );
-        setAllLicenses(thisYearLicenses);
-
-        let datax = [];
-        user.manageList.forEach((dept) => {
-          const filteredLicenses = thisYearLicenses.filter(
-            (license) => license.department._id === dept._id
+        if (isDirector) {
+          const thisYearLicenses = data?.licenses.filter(
+            (val) => val.year <= new Date().getFullYear()
           );
-          datax = [...datax, ...filteredLicenses];
-        });
-        setLicenses(datax);
+          setAllLicenses(thisYearLicenses);
+
+          let datax = [];
+          user.manageList.forEach((dept) => {
+            const filteredLicenses = thisYearLicenses.filter(
+              (license) => license.department._id === dept._id
+            );
+            datax = [...datax, ...filteredLicenses];
+          });
+          setLicenses(datax);
+        }else{
+          setAllLicenses(data?.licenses)
+          setLicenses(data?.licenses)
+        }
       }
       setLoading(false);
     } catch (error) {
@@ -229,7 +242,7 @@ const Home = () => {
                   <TableCell sx={{ fontWeight: "bold", textAlign: "center" }}>
                     Name
                   </TableCell>
-                 
+
                   <TableCell sx={{ fontWeight: "bold", textAlign: "center" }}>
                     Department Name
                   </TableCell>
@@ -315,7 +328,7 @@ const Home = () => {
                           <TableCell sx={{ textAlign: "center" }}>
                             {row.name}
                           </TableCell>
-                        
+
                           <TableCell sx={{ textAlign: "center" }}>
                             {row?.department?.name}
                           </TableCell>
