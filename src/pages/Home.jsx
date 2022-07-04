@@ -326,7 +326,7 @@ const Home = () => {
                       ?.map((row) => (
                         <TableRow key={row._id}>
                           <TableCell sx={{ textAlign: "center" }}>
-                            {row.name}
+                          <ReadMore limit={40}>{row?.name}</ReadMore>
                           </TableCell>
 
                           <TableCell sx={{ textAlign: "center" }}>
@@ -334,7 +334,7 @@ const Home = () => {
                           </TableCell>
 
                           <TableCell sx={{ textAlign: "center" }}>
-                            {row.description}
+                          <ReadMore limit={150}>{row.description}</ReadMore>
                           </TableCell>
                           <TableCell sx={{ textAlign: "center" }}>
                             {row.type}
@@ -427,4 +427,32 @@ const Home = () => {
   );
 };
 
+function ReadMore({ children,limit }) {
+  const text = children;
+
+  const [isShow, setIsShowLess] = useState(true);
+  const result = isShow ? text.slice(0, limit) : text;
+  const isLonger = text.length > limit;
+
+  function toggleIsShow() {
+    setIsShowLess(!isShow);
+  }
+
+  return (
+    <p>
+      {result}
+      {isLonger ? (
+        <Typography
+          component="span"
+          variant="subtitle2"
+          sx={{ color: "blue", cursor: "pointer" }}
+          onClick={toggleIsShow}
+        >
+          {isShow ? "  Read More" : "  Read Less"}
+        </Typography>
+      ) : null}
+    </p>
+  );
+}
 export default Home;
+
