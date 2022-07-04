@@ -334,7 +334,7 @@ const Home = () => {
                           </TableCell>
 
                           <TableCell sx={{ textAlign: "center" }}>
-                          <ReadMore limit={150}>{row.description}</ReadMore>
+                          <ReadMore limit={80}>{row.description}</ReadMore>
                           </TableCell>
                           <TableCell sx={{ textAlign: "center" }}>
                             {row.type}
