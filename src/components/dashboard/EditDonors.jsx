@@ -48,7 +48,8 @@ const EditDonor = ({ loading, fetchDonors, donor }) => {
         }
       }
     } catch (error) {
-      return setError(error?.response.data.message);
+      return setError(error?.response?.data?.message||"Error while Updating the Donor.");
+
     }
   };
   return (

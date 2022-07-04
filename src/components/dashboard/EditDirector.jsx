@@ -111,7 +111,8 @@ const UpdateDirector = ({
         }
       }
     } catch (error) {
-      return setError(error?.response.data.message);
+      return setError(error?.response?.data?.message||"Error while Updating the Director.");
+
     }
   };
   useEffect(() => {

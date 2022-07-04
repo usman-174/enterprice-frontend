@@ -53,7 +53,8 @@ import React from "react";
           return handleClose();
         }
       } catch (error) {
-        return setError(error?.response.data.message);
+        return setError(error?.response?.data?.message||"Error while creating the Supplier.");
+
       }
     };
     return (

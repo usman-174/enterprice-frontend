@@ -62,7 +62,7 @@ const AddUser = ({ departmentList, fetchUsers }) => {
     if (!email || !role) {
       return setError("Please provide all details");
     }
-    if(!department){
+    if(role !=="admin"&&!department){
       return setError("Please select a valid Department");
 
     }
@@ -80,7 +80,8 @@ const AddUser = ({ departmentList, fetchUsers }) => {
         return handleClose();
       }
     } catch (error) {
-      return setError(error?.response.data.message);
+      return setError(error?.response?.data?.message||"Error while adding the User.");
+
     }
   };
   return (

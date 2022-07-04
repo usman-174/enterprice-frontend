@@ -79,7 +79,7 @@ const UpdateUser = ({ user, loading, fetchUsers, departmentList }) => {
     if (role && role !== user.role) {
       fields.role = role;
     }
-    if (department && department !== user.department._id) {
+    if (role !== "admin" && department && department !== user.department._id) {
       fields.department = department;
     }
     if (username && username !== user.username) {
@@ -99,7 +99,8 @@ const UpdateUser = ({ user, loading, fetchUsers, departmentList }) => {
         }
       }
     } catch (error) {
-      return setError(error?.response.data.message);
+      return setError(error?.response?.data?.message||"Error while Updating the User.");
+
     }
   };
   return (

@@ -47,7 +47,7 @@ const Departments = () => {
       }
     } catch (error) {
       toast.error(
-        error?.response.data.message || "Failed to Delete the department",
+        error?.response?.data?.message || "Failed to Delete the department",
         {
           position: "top-right",
           autoClose: 2000,

@@ -146,7 +146,8 @@ const UpdateLicense = ({
         }
       }
     } catch (error) {
-      return setError(error?.response.data.message);
+      return setError(error?.response?.data?.message||"Error while Updating the License.");
+
     }
   };
   return (

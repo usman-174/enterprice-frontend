@@ -127,7 +127,7 @@ const AddLicense = ({
         return handleClose();
       }
     } catch (error) {
-      return setError(error?.response.data.message);
+      return setError(error?.response?.data?.message||"Error while adding the License.");
     }
   };
   return (

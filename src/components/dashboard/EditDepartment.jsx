@@ -62,7 +62,8 @@ const UpdateDepartment = ({  loading,fetchDepartments ,department,directions}) =
           }
       }
     } catch (error) {
-      return setError(error?.response.data.message);
+      return setError(error?.response?.data?.message||"Error while Updating the Department.");
+
     }
   };
   return (
