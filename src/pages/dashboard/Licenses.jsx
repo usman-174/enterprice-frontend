@@ -114,6 +114,7 @@ const Licenses = () => {
       console.error(error?.response.data.message);
     }
   };
+  
   const fetchSupplier = async () => {
     try {
       const { data } = await axios.get("suppliers");
@@ -280,8 +281,8 @@ const Licenses = () => {
                       </TableCell>
 
                       <TableCell sx={{ textAlign: "center" }}>
-                        <ReadMore limit={150}>{row.description}</ReadMore>
-                      </TableCell>
+                        <ReadMore limit={80}>{row.description}</ReadMore>
+                      </TableCell> 
                       <TableCell sx={{ textAlign: "center" }}>
                         {row.type}
                       </TableCell>
@@ -292,6 +293,7 @@ const Licenses = () => {
                         {row.validityTime} years
                       </TableCell>
                       <TableCell sx={{ textAlign: "center" }}>
+                       
                         {row.firstDate
                           ? row.daysTillValidityExpiry > 0
                             ? row.daysTillValidityExpiry + " days"

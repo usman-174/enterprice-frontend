@@ -28,7 +28,7 @@ import { toast } from "react-toastify";
 const Home = () => {
   const { user } = useUser();
   const [loading, setLoading] = useState(true);
-  const isDirector = user.role === "director";
+  const isDirector = user.role !== "user";
   const [licenses, setLicenses] = useState([]);
   const [AllLicenses, setAllLicenses] = useState([]);
   const [departmentList, setDepartmentList] = useState([]);
@@ -132,6 +132,7 @@ const Home = () => {
       console.error(error?.response.data.message);
     }
   };
+  
   const fetchSupplier = async () => {
     try {
       const { data } = await axios.get("suppliers");
@@ -176,6 +177,9 @@ const Home = () => {
         <AddLicense
           fetchLicenses={fetchLicenses}
           departmentList={departmentList}
+          loading={loading}
+          suppliers={suppliers}
+          donors={donors}
         />
       ) : null}
       <Box
@@ -215,11 +219,11 @@ const Home = () => {
               onChange={handleDepartmentFilter}
             >
               <MenuItem value={"All Departments"}>All Departments</MenuItem>
-              {user?.manageList.map((dept) => (
+              {user?.manageList.map((dept) => 
                 <MenuItem key={dept._id} value={dept.name}>
                   {dept.name}
                 </MenuItem>
-              ))}
+              )}
             </Select>
           </FormControl>
         ) : null}
@@ -345,20 +349,26 @@ const Home = () => {
                           <TableCell sx={{ textAlign: "center" }}>
                             {row.validityTime} years
                           </TableCell>
+                         
                           <TableCell sx={{ textAlign: "center" }}>
-                            {row.firstDate
-                              ? row.daysTillValidityExpiry + " days"
-                              : "N/A"}
-                          </TableCell>
+                       
+                        {row.firstDate
+                          ? row.daysTillValidityExpiry > 0
+                            ? row.daysTillValidityExpiry + " days"
+                            : "EXPIRED"
+                          : "N/A"}
+                      </TableCell>
 
                           <TableCell sx={{ textAlign: "center" }}>
                             {row.supportTime} years
                           </TableCell>
                           <TableCell sx={{ textAlign: "center" }}>
-                            {row.firstDate
-                              ? row.daysTillSupportExpiry + " days"
-                              : "N/A"}
-                          </TableCell>
+                        {row.firstDate
+                          ? row.daysTillSupportExpiry > 0
+                            ? row.daysTillSupportExpiry + " days"
+                            : "EXPIRED"
+                          : "N/A"}
+                      </TableCell>
 
                           <TableCell sx={{ textAlign: "center" }}>
                             {row.firstDate
@@ -384,7 +394,7 @@ const Home = () => {
                           <TableCell sx={{ textAlign: "center" }}>
                             {row?.year}
                           </TableCell>
-                          {!user.seeOnly && user.role !== "director" ? (
+                          {!user.seeOnly && !isDirector ? (
                             <TableCell sx={{ textAlign: "center" }}>
                               <UpdateLicense
                                 departmentList={departmentList}

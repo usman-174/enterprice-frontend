@@ -17,6 +17,7 @@ import { DesktopDatePicker } from "@mui/x-date-pickers/DesktopDatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import axios from "axios";
 import React from "react";
+import { useUser } from "../../Store";
 
 const AddLicense = ({
   departmentList,
@@ -25,6 +26,7 @@ const AddLicense = ({
   donors,
   suppliers,
 }) => {
+  const { user } = useUser();
   const [isOpen, setIsOpen] = React.useState(false);
 
   const [name, setName] = React.useState("");
@@ -80,7 +82,7 @@ const AddLicense = ({
 
     if (
       !name ||
-      !department ||
+      (!department && user.role !=="user" )||
       !description ||
       !sourceOfFund ||
       !type ||
@@ -115,7 +117,7 @@ const AddLicense = ({
         supportTime,
         amount,
         sourceOfFund,
-        department,
+        department : user.role==="user" ? user.department : department,
         donor: sourceOfFund === "own" ? undefined : donor,
         supplier,
         supplierContact,
@@ -392,7 +394,7 @@ const AddLicense = ({
                 my: 2,
               }}
             >
-              <FormControl
+            {user.role !== "user"?  <FormControl
                 sx={{
                   width: "43%",
                 }}
@@ -407,7 +409,7 @@ const AddLicense = ({
                     <TextField {...params} label="Select Department" />
                   )}
                 />
-              </FormControl>
+              </FormControl>:null}
               <FormControl
                 sx={{
                   width: "40%",
