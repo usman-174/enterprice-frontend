@@ -24,6 +24,7 @@ import UpdateLicense from "../components/dashboard/EditLicense";
 import { useUser } from "../Store";
 const ComingLicenses = () => {
   const { user } = useUser();
+  const isDirector = user.role !== "user";
 
   const [loading, setLoading] = useState(true);
   const [licenses, setLicenses] = useState([]);
@@ -45,22 +46,31 @@ const ComingLicenses = () => {
   const handleLimitChange = (event) => {
     setLimit(event.target.value);
   };
+  
   const handleDepartmentFilter = (event) => {
     setDepartmentFilter(event.target.value);
     if (event.target.value === "All Departments") {
       let data = [];
-      user.manageList.forEach((dept) => {
-        const filteredLicenses = AllLicenses.filter(
-          (license) => license.department._id === dept._id
-        );
-        data = [...data,...filteredLicenses];
-      });
+      if (isDirector) {
+        user.manageList.forEach((dept) => {
+          const filteredLicenses = AllLicenses.filter(
+            (license) => license.department._id === dept._id
+          );
+          data = [...data, ...filteredLicenses];
+        });
+      } 
       setLicenses(data);
     } else {
-      const foundDept = departmentList.find(x=>x.name ===event.target.value)
-      const data = AllLicenses.filter(
-        (license) => license.department._id === foundDept._id
-      );
+      let data = [];
+      if (isDirector) {
+        const foundDept = departmentList.find(
+          (x) => x.name === event.target.value
+        );
+        data = AllLicenses.filter(
+          (license) => license.department._id === foundDept._id
+        );
+      } 
+
       setLicenses(data);
     }
   };
@@ -74,25 +84,30 @@ const ComingLicenses = () => {
       return;
     }
   };
-
   const fetchLicenses = async () => {
     try {
       setLoading(true);
       const { data } = await axios.get("licenses");
 
       if (data?.licenses) {
-        const nextYearLicenses = data?.licenses.filter(
-          (val) => val.year > new Date().getFullYear()
-        );
-        setAllLicenses(nextYearLicenses);
-        let datax = [];
-        user.manageList.forEach((dept) => {
-          const filteredLicenses = nextYearLicenses.filter(
-            (license) => license.department._id === dept._id
+        if (isDirector) {
+          const thisYearLicenses = data?.licenses.filter(
+            (val) => val.year > new Date().getFullYear()
           );
-          datax = [...datax, ...filteredLicenses];
-        });
-        setLicenses(datax);
+          setAllLicenses(thisYearLicenses);
+
+          let datax = [];
+          user.manageList.forEach((dept) => {
+            const filteredLicenses = thisYearLicenses.filter(
+              (license) => license.department._id === dept._id
+            );
+            datax = [...datax, ...filteredLicenses];
+          });
+          setLicenses(datax);
+        }else{
+          setAllLicenses(data?.licenses)
+          setLicenses(data?.licenses)
+        }
       }
       setLoading(false);
     } catch (error) {
@@ -106,6 +121,37 @@ const ComingLicenses = () => {
       setLoading(false);
     }
   };
+  // const fetchLicenses = async () => {
+  //   try {
+  //     setLoading(true);
+  //     const { data } = await axios.get("licenses");
+
+  //     if (data?.licenses) {
+  //       const nextYearLicenses = data?.licenses.filter(
+  //         (val) => val.year > new Date().getFullYear()
+  //       );
+  //       setAllLicenses(nextYearLicenses);
+  //       let datax = [];
+  //       user.manageList.forEach((dept) => {
+  //         const filteredLicenses = nextYearLicenses.filter(
+  //           (license) => license.department._id === dept._id
+  //         );
+  //         datax = [...datax, ...filteredLicenses];
+  //       });
+  //       setLicenses(datax);
+  //     }
+  //     setLoading(false);
+  //   } catch (error) {
+  //     toast.error("Failed to load Licenses", {
+  //       position: "top-right",
+  //       autoClose: 2000,
+  //       hideProgressBar: false,
+  //       closeOnClick: true,
+  //       pauseOnHover: false,
+  //     });
+  //     setLoading(false);
+  //   }
+  // };
 
   const fetchDonors = async () => {
     try {
@@ -238,9 +284,7 @@ const ComingLicenses = () => {
                   <TableCell sx={{ fontWeight: "bold", textAlign: "center" }}>
                     Validity Years
                   </TableCell>
-                  <TableCell sx={{ fontWeight: "bold", textAlign: "center" }}>
-                    Days left in Validity Expiry
-                  </TableCell>
+
 
                   <TableCell sx={{ fontWeight: "bold", textAlign: "center" }}>
                     Support Years
@@ -319,12 +363,6 @@ const ComingLicenses = () => {
                             {row.validityTime} years
                           </TableCell>
                           <TableCell sx={{ textAlign: "center" }}>
-                            {row.firstDate
-                              ? row.daysTillValidityExpiry + " days"
-                              : "N/A"}
-                          </TableCell>
-
-                          <TableCell sx={{ textAlign: "center" }}>
                             {row.supportTime} years
                           </TableCell>
                           
@@ -349,7 +387,7 @@ const ComingLicenses = () => {
                           <TableCell sx={{ textAlign: "center" }}>
                             {row?.year}
                           </TableCell>
-                          {!user.seeOnly && user.role !== "director" ? (
+                          {!user.seeOnly && !isDirector ? (
                             <TableCell sx={{ textAlign: "center" }}>
                               <UpdateLicense
                                 departmentList={departmentList}
