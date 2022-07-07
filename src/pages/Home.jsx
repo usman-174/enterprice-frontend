@@ -90,10 +90,11 @@ const Home = () => {
       const { data } = await axios.get("licenses");
 
       if (data?.licenses) {
+        const thisYearLicenses = data?.licenses.filter(
+          (val) => val.year <= new Date().getFullYear()
+        );
         if (isDirector) {
-          const thisYearLicenses = data?.licenses.filter(
-            (val) => val.year <= new Date().getFullYear()
-          );
+          
           setAllLicenses(thisYearLicenses);
 
           let datax = [];
@@ -105,8 +106,8 @@ const Home = () => {
           });
           setLicenses(datax);
         }else{
-          setAllLicenses(data?.licenses)
-          setLicenses(data?.licenses)
+          setAllLicenses(thisYearLicenses)
+          setLicenses(thisYearLicenses)
         }
       }
       setLoading(false);
