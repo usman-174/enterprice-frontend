@@ -59,7 +59,10 @@ const Licenses = () => {
             data?.licenses.filter((val) => val.year > new Date().getFullYear())
           );
         }
-        setLicenses(data?.licenses);
+        const expired = data.licenses.filter(x=>x.daysTillValidityExpiry < 8 && x.daysTillValidityExpiry > 0)
+        if(expired.length){
+          await axios.post("licenses/notify",{licenses:expired})
+        }
       }
       setLoading(false);
     } catch (error) {
