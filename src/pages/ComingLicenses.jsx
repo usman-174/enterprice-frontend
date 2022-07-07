@@ -22,6 +22,7 @@ import TableRow from "@mui/material/TableRow";
 import { Link } from "react-router-dom";
 import UpdateLicense from "../components/dashboard/EditLicense";
 import { useUser } from "../Store";
+import AlertDialog from "../components/AlertDialog";
 const ComingLicenses = () => {
   const { user } = useUser();
   const isDirector = user.role !== "user";
@@ -173,6 +174,25 @@ const ComingLicenses = () => {
       }
     } catch (error) {
       console.error(error?.response.data.message);
+    }
+  };
+  const handleDelete = async (id) => {
+    try {
+      const { data } = await axios.delete("licenses/" + id);
+      if (data?.success) {
+        return fetchLicenses();
+      }
+    } catch (error) {
+      toast.error(
+        error?.response.data.message || "Failed to Delete the License",
+        {
+          position: "top-right",
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+        }
+      );
     }
   };
   useEffect(() => {
@@ -389,6 +409,7 @@ const ComingLicenses = () => {
                           </TableCell>
                           {!user.seeOnly && !isDirector ? (
                             <TableCell sx={{ textAlign: "center" }}>
+                               <AlertDialog handleDelete={handleDelete} id={row._id} />
                               <UpdateLicense
                                 departmentList={departmentList}
                                 license={row}
