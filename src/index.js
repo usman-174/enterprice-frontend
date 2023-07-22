@@ -4,9 +4,7 @@ import axios from "axios";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 console.log({mode:process.env.NODE_ENV});
-  axios.defaults.baseURL =process.env.API ||
-  "http://localhost:8000/api"
-  // "http://localhost:8000/api"
+  axios.defaults.baseURL =process.env.API 
   axios.defaults.withCredentials = true;
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
