@@ -1,10 +1,14 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-
+import axios from "axios";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
-console.log({mode:process.env.NODE_ENV,api:process.env.REACT_APP_API });
- 
+console.log({mode:process.env.NODE_ENV,API:process.env.REACT_APP_API});
+  axios.defaults.baseURL =process.env.REACT_APP_API ||
+  "https://enterprice-app-backend-production.up.railway.app/api"
+
+  axios.defaults.withCredentials = true;
+
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>

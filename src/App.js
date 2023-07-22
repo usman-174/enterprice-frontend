@@ -35,17 +35,9 @@ function App() {
     const checkUser = async () => {
       try {
         let response;
-        if (window.location.pathname.includes("login")) {
-          // Use axios if URL contains "login" string
-          response = await axios.get(
-            process.env.REACT_APP_API + "/auth/getUser" ||
-              "https://enterprice-app-backend-production.up.railway.app/api/auth/getUser",
-            { withCredentials: true }
-          );
-        } else {
-          // Use axiosInstance if URL does not contain "login" string
-          response = await axiosInstance.get("/auth/getUser");
-        }
+
+        // Use axios if URL contains "login" string
+        response = await axios.get("/auth/getUser");
 
         setUser(response.data);
       } catch (error) {

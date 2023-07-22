@@ -7,14 +7,6 @@ const instance = axios.create({
   withCredentials:true
 });
 
-// Interceptor to check for 401 status code
-instance.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    // If the response status code is 401 (Unauthorized)
-   
-    return Promise.reject(error);
-  }
-);
+
 
 export default instance;
