@@ -3,10 +3,8 @@ import ReactDOM from "react-dom/client";
 import axios from "axios";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
-console.log({mode:process.env.NODE_ENV});
-  axios.defaults.baseURL =process.env.API 
-  axios.defaults.withCredentials = true;
-
+console.log({mode:process.env.NODE_ENV,api:process.env.API });
+ 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
