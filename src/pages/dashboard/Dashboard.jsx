@@ -18,20 +18,20 @@ const Dashboard = () => {
       >
         Dashboard
       </Typography>
-
       <Box
         sx={{
-          marginTop: "30px ",
+          marginTop: "30px",
           padding: { xs: "30px", sm: "0px" },
           display: "flex",
           justifyContent: "center",
           flexDirection: { xs: "column", sm: "row" },
+          flexWrap: "wrap",
         }}
       >
         <Button
           variant="contained"
           sx={{
-            margin: "5px 20px",
+            margin: "5px",
             backgroundColor: "#f2f232",
             color: "#3D57DB",
             "&:hover": {
@@ -39,7 +39,6 @@ const Dashboard = () => {
             },
             fontSize: "22px",
           }}
-          // color="warning"
           component={Link}
           to="users"
         >
@@ -47,7 +46,7 @@ const Dashboard = () => {
         </Button>
         <Button
           sx={{
-            margin: "5px 20px",
+            margin: "5px",
             backgroundColor: "#f2f232",
             color: "#3D57DB",
             "&:hover": {
@@ -64,7 +63,7 @@ const Dashboard = () => {
         <Button
           variant="contained"
           sx={{
-            margin: "5px 20px",
+            margin: "5px",
             backgroundColor: "#f2f232",
             color: "#3D57DB",
             "&:hover": {
@@ -80,7 +79,7 @@ const Dashboard = () => {
         <Button
           variant="contained"
           sx={{
-            margin: "5px 20px",
+            margin: "5px",
             backgroundColor: "#f2f232",
             color: "#3D57DB",
             "&:hover": {
@@ -96,7 +95,7 @@ const Dashboard = () => {
         <Button
           variant="contained"
           sx={{
-            margin: "5px 20px",
+            margin: "5px",
             backgroundColor: "#f2f232",
             color: "#3D57DB",
             "&:hover": {
@@ -112,7 +111,7 @@ const Dashboard = () => {
         <Button
           variant="contained"
           sx={{
-            margin: "5px 20px",
+            margin: "5px",
             backgroundColor: "#f2f232",
             color: "#3D57DB",
             "&:hover": {
@@ -128,7 +127,7 @@ const Dashboard = () => {
         <Button
           variant="contained"
           sx={{
-            margin: "5px 20px",
+            margin: "5px",
             backgroundColor: "#f2f232",
             color: "#3D57DB",
             "&:hover": {

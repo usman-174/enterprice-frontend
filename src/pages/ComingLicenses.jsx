@@ -1,5 +1,6 @@
 import Table from "@mui/material/Table";
-import axios from "axios";
+import axiosInstance from '../axiosInstance';
+
 import { useEffect, useState } from "react";
 import logo from "../assests/logo.png";
 import { toast } from "react-toastify";
@@ -77,7 +78,7 @@ const ComingLicenses = () => {
   };
   const fetchDepartments = async () => {
     try {
-      const { data } = await axios.get("departments");
+      const { data } = await axiosInstance.get("departments");
       if (data?.departments) {
         setDepartmentList(data?.departments);
       }
@@ -88,7 +89,7 @@ const ComingLicenses = () => {
   const fetchLicenses = async () => {
     try {
       setLoading(true);
-      const { data } = await axios.get("licenses");
+      const { data } = await axiosInstance.get("licenses");
 
       if (data?.licenses) {
         const thisYearLicenses = data?.licenses.filter(
@@ -125,7 +126,7 @@ const ComingLicenses = () => {
   // const fetchLicenses = async () => {
   //   try {
   //     setLoading(true);
-  //     const { data } = await axios.get("licenses");
+  //     const { data } = await axiosInstance.get("licenses");
 
   //     if (data?.licenses) {
   //       const nextYearLicenses = data?.licenses.filter(
@@ -156,7 +157,7 @@ const ComingLicenses = () => {
 
   const fetchDonors = async () => {
     try {
-      const { data } = await axios.get("donors");
+      const { data } = await axiosInstance.get("donors");
 
       if (data?.donors) {
         setDonors(data?.donors);
@@ -167,7 +168,7 @@ const ComingLicenses = () => {
   };
   const fetchSupplier = async () => {
     try {
-      const { data } = await axios.get("suppliers");
+      const { data } = await axiosInstance.get("suppliers");
 
       if (data?.suppliers) {
         setSuppliers(data?.suppliers);
@@ -178,7 +179,7 @@ const ComingLicenses = () => {
   };
   const handleDelete = async (id) => {
     try {
-      const { data } = await axios.delete("licenses/" + id);
+      const { data } = await axiosInstance.delete("licenses/" + id);
       if (data?.success) {
         return fetchLicenses();
       }

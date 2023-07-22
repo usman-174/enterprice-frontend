@@ -9,20 +9,18 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
-import axios from "axios";
+import axiosInstance from '../axiosInstance';
+
 import { useState } from "react";
+
 function Copyright(props) {
   return (
-    <Typography
-      variant="body2"
-      color="text.secondary"
-      align="center"
-      {...props}
-    >
+    <Typography variant="body2" color="text.secondary" align="center" {...props}>
       You will be mailed with a new Password.
     </Typography>
   );
 }
+
 export default function ForgotPassword() {
   const navigate = useNavigate();
 
@@ -31,32 +29,41 @@ export default function ForgotPassword() {
 
   const handleSubmit = async (event) => {
     setError("");
-
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
+
     try {
       setLoading(true);
-      const { data } = await axios.post("auth/change_password", {
+      const { data } = await axiosInstance.post("auth/change_password", {
         email: formData.get("email"),
       });
 
       if (data?.success) {
-        toast.info("Password sent to "+ formData.get("email"), {
+        toast.info("Password sent to " + formData.get("email"), {
           position: "top-right",
           autoClose: 3000,
           hideProgressBar: false,
           closeOnClick: true,
           pauseOnHover: true,
         });
+
         navigate(`/login`, {
           state: { email: formData.get("email") },
         });
+      } else {
+        setError("Failed to reset password. Please try again later.");
       }
     } catch (error) {
-      setError(error?.response.data.message);
+      if (error?.response) {
+        setError(error.response.data.message);
+      } else {
+        setError("An error occurred. Please try again later.");
+      }
+    } finally {
+      setLoading(false); // Stop loading regardless of success or error
     }
-    setLoading(false);
   };
+
   return (
     <Container component="main" maxWidth="xs">
       <CssBaseline />
@@ -104,6 +111,7 @@ export default function ForgotPassword() {
             fullWidth
             variant="contained"
             sx={{ mt: 3, mb: 2 }}
+            disabled={loading} // Disable the button during loading
           >
             {loading ? "Loading..." : "Reset Password"}
           </Button>

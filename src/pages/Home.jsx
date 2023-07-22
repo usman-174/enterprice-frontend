@@ -1,6 +1,9 @@
 import Table from "@mui/material/Table";
-import axios from "axios";
+
 import moment from "moment";
+
+import axiosInstance from '../axiosInstance';
+
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import logo from "../assests/logo.png";
@@ -76,7 +79,7 @@ const Home = () => {
   };
   const fetchDepartments = async () => {
     try {
-      const { data } = await axios.get("departments");
+      const { data } = await axiosInstance.get("departments");
       if (data?.departments) {
         setDepartmentList(data?.departments);
       }
@@ -88,7 +91,7 @@ const Home = () => {
   const fetchLicenses = async () => {
     try {
       setLoading(true);
-      const { data } = await axios.get("licenses");
+      const { data } = await axiosInstance.get("licenses");
 
       if (data?.licenses) {
         const thisYearLicenses = data?.licenses.filter(
@@ -125,7 +128,7 @@ const Home = () => {
   };
   const fetchDonors = async () => {
     try {
-      const { data } = await axios.get("donors");
+      const { data } = await axiosInstance.get("donors");
 
       if (data?.donors) {
         setDonors(data?.donors);
@@ -137,7 +140,7 @@ const Home = () => {
   
   const fetchSupplier = async () => {
     try {
-      const { data } = await axios.get("suppliers");
+      const { data } = await axiosInstance.get("suppliers");
 
       if (data?.suppliers) {
         setSuppliers(data?.suppliers);
@@ -148,7 +151,7 @@ const Home = () => {
   };
   const handleDelete = async (id) => {
     try {
-      const { data } = await axios.delete("licenses/" + id);
+      const { data } = await axiosInstance.delete("licenses/" + id);
       if (data?.success) {
         return fetchLicenses();
       }

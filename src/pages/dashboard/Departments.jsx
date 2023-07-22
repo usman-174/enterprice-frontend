@@ -14,6 +14,7 @@ import moment from "moment";
 import AlertDialog from "../../components/AlertDialog";
 import AddDepartment from "../../components/dashboard/AddDepartment";
 import UpdateDepartment from "../../components/dashboard/EditDepartment";
+
 const Departments = () => {
   const [loading, setLoading] = useState(true);
   const [departments, setDepartments] = useState([]);
@@ -32,6 +33,7 @@ const Departments = () => {
       }
     } catch (error) {}
   };
+
   const handlePagination = (_, page) => {
     setCurrentPage(page);
   };
@@ -39,6 +41,7 @@ const Departments = () => {
   const handleLimitChange = (event) => {
     setLimit(event.target.value);
   };
+
   const handleDeleteDepartments = async (id) => {
     try {
       const { data } = await axios.delete(`/departments/${id}`);
@@ -58,6 +61,7 @@ const Departments = () => {
       );
     }
   };
+
   const fetchDepartments = async () => {
     try {
       setLoading(true);
@@ -84,9 +88,13 @@ const Departments = () => {
     fetchDirections();
     // eslint-disable-next-line
   }, []);
+
+  const isAddDepartmentDisabled = directions.length === 0;
+
   if (loading && !departments.length) {
     return <img src={logo} alt="loading" className="loader" />;
   }
+
   return (
     <Box sx={{ margin: "20px" }}>
       <Box sx={{ margin: "20px auto", textAlign: "center" }}>
@@ -102,10 +110,22 @@ const Departments = () => {
           />
         ) : null}
       </Box>
+     
+      {/* Display small text indicating that a direction needs to be created first */}
+      
+
+      {/* Disable the "Add Department" button if the "directions" data is empty */}
       <AddDepartment
         directions={directions}
         fetchDepartments={fetchDepartments}
+        disabled={isAddDepartmentDisabled}
       />
+      {isAddDepartmentDisabled ? (
+        <Typography sx={{ textAlign: "left", color: "gray",fontSize:"13px",marginLeft:"60px" }}>
+          First, create a direction to make a department.
+        </Typography>
+      ) : null}
+      <br />
       <TableContainer>
         <Table
           size="small"

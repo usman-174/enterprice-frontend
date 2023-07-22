@@ -10,30 +10,12 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
-import axios from "axios";
+import axiosInstance from "../axiosInstance";
 import { useState } from "react";
 import { useUser } from "../Store";
-// function Copyright(props) {
-//   return (
-//     <Typography
-//       variant="body2"
-//       color="text.secondary"
-//       align="center"
-//       {...props}
-//     >
-//       {"Copyright © "}
-//       <Link color="inherit" href="https://mui.com/">
-//         EnterPrice_App
-//       </Link>{" "}
-//       {new Date().getFullYear()}
-//       {"."}
-//     </Typography>
-//   );
-// }
 
 export default function SignIn() {
-const { state } = useLocation();
-
+  const { state } = useLocation();
   const navigate = useNavigate();
   const { setUser } = useUser();
 
@@ -43,29 +25,32 @@ const { state } = useLocation();
   const handleSubmit = async (event) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
+
     try {
       setLoading(true);
-      const { data } = await axios.post("auth/login", {
+      setError(""); // Clear any previous error
+      const { data } = await axiosInstance.post("auth/login", {
         email: formData.get("email"),
         password: formData.get("password"),
       });
-      if (data) {
-        if (data?.success) {
-          setUser(data?.user);
-          if (data?.user.role === "admin") {
-            navigate(`/dashboard`);
-          } else {
-            navigate(`/`);
-          }
-      setLoading(false);
 
-        }
+      if (data && data.success) {
+        setUser(data.user);
+        navigate(data.user.role === "admin" ? `/dashboard` : `/`);
       }
     } catch (error) {
-      setError(error?.response.data.message);
-      setLoading(false);
+      if (error.response) {
+        // If the server responded with an error message
+        setError(error.response.data.message);
+      } else {
+        // If there was a network error or the server is down
+        setError("An error occurred. Please try again later.");
+      }
+    } finally {
+      setLoading(false); // Regardless of success or error, stop loading
     }
   };
+
   return (
     <Container component="main" maxWidth="xs">
       <CssBaseline />
@@ -102,7 +87,7 @@ const { state } = useLocation();
             required
             fullWidth
             id="email"
-            defaultValue={state?.email||""}
+            defaultValue={state?.email || ""}
             label="Email Address"
             name="email"
             autoComplete="email"
@@ -122,16 +107,13 @@ const { state } = useLocation();
             control={<Checkbox value="remember" color="primary" />}
             label="Remember me"
           /> */}
-           <Grid container>
+          <Grid container>
             <Grid item xs>
-              
-                <Button
+              <Button
                 sx={{
-                
                   color: "black",
                   fontSize: "16px",
                 }}
-          
                 component={Link}
                 to={"/forgot_password"}
               >
@@ -144,10 +126,10 @@ const { state } = useLocation();
             fullWidth
             variant="contained"
             sx={{ mt: 2, mb: 2 }}
+            disabled={loading} // Disable the button during loading
           >
             {loading ? "Loading..." : "Sign In"}
           </Button>
-         
         </Box>
       </Box>
       {/* <Copyright sx={{ mt: 8, mb: 4 }} /> */}

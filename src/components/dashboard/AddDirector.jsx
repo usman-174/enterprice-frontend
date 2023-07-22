@@ -5,21 +5,21 @@ import {
   InputLabel,
   MenuItem,
   Select,
-  Typography
+  Typography,
 } from "@mui/material";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Modal from "@mui/material/Modal";
 import TextField from "@mui/material/TextField";
 import axios from "axios";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
+
 const style = {
   position: "absolute",
   top: "50%",
   left: "50%",
   transform: "translate(-50%, -50%)",
   width: { md: "35%", xs: "90%" },
-
   borderRadius: 2,
   bgcolor: "background.paper",
   border: "1px solid crimson",
@@ -33,60 +33,67 @@ const AddDirector = ({
   allDirections,
   fetchDepartments,
 }) => {
-  const IDX = React.useId();
-  const [open, setOpen] = React.useState(false);
-  const [email, setEmail] = React.useState("");
-  const [username, setUsername] = React.useState("");
-  const [manageList, setManageList] = React.useState([]);
-  const [direction, setDirection] = React.useState("");
-  const [directions, setDirections] = React.useState(allDirections);
-  
-  const [department, setDepartment] = React.useState("");
-  const [departments, setDepartments] = React.useState([]);
+  const [open, setOpen] = useState(false);
+  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
+  const [manageList, setManageList] = useState([]);
+  const [direction, setDirection] = useState("");
+  const [directions, setDirections] = useState([]);
 
-  const [error, setError] = React.useState("");
+  const [department, setDepartment] = useState("");
+  const [departments, setDepartments] = useState([]);
+  const [error, setError] = useState("");
 
   const handleChangeDirection = (_, v) => {
     setError("");
-
-    if (v && !directions.find((x) => x.name === v)) {
+    if (!v || !directions.find((x) => x.name === v)) {
       return setError("Select a valid Direction");
     }
-
     setDirection(v);
     const departmentsx = departmentList.filter((dept) => dept.direction === v);
-
-    if (departmentsx.length) {
-      setDepartments(departmentsx);
-    }
+    setDepartments(departmentsx);
   };
+
   const removeManageDepartment = (val) => {
     setError("");
     setDepartment("");
-    setDepartments((e) => [...e, val]);
-
-    setManageList((list) => list.filter((dept) => dept._id !== val._id));
+    setDepartments((prevDepartments) => [...prevDepartments, val]);
+    setManageList((prevManageList) =>
+      prevManageList.filter((dept) => dept._id !== val._id)
+    );
   };
+
   const handleDepartmentChange = (event) => {
     setDepartment(event.target.value);
-    if (!manageList.find((x) => x._id === event.target.value_id)) {
-      setManageList((e) => [...e, event.target.value]);
-      const filteredDepartments = departments.filter(
-        (dept) => dept._id !== event.target.value._id
+    if (!manageList.find((x) => x._id === event.target.value._id)) {
+      setManageList((prevManageList) => [...prevManageList, event.target.value]);
+      setDepartments((prevDepartments) =>
+        prevDepartments.filter((dept) => dept._id !== event.target.value._id)
       );
-
-      setDepartments(filteredDepartments);
     }
   };
 
   const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
-  const handleSubmit = async (e) => {
+  const handleClose = () => {
+    setOpen(false);
+    resetForm();
+  };
+
+  const resetForm = () => {
+    setEmail("");
+    setUsername("");
+    setManageList([]);
+    setDirection("");
+    setDepartment("");
     setError("");
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!email || !manageList.length) {
-      return setError("Please provide all details X");
+      return setError("Please provide all details");
     }
+
     try {
       const { data } = await axios.post("auth/add_director", {
         email,
@@ -94,23 +101,22 @@ const AddDirector = ({
         manageList: manageList.map((list) => list._id),
       });
       if (data?.success) {
-        e.target.reset();
+        resetForm();
         fetchUsers();
         fetchDepartments();
-        return handleClose();
+        handleClose();
       }
     } catch (error) {
-      return setError(error?.response?.data?.message||"Error while creating the Director.");
-
+      setError(error?.response?.data?.message || "Error while creating the Director.");
     }
   };
-  useEffect(() => {
-    if(allDirections){
 
+  useEffect(() => {
+    if (allDirections) {
       setDirections(allDirections);
     }
-    // eslint-disable-next-line
   }, [allDirections]);
+
   return (
     <Box sx={{ position: "relative" }}>
       <Button
@@ -190,13 +196,11 @@ const AddDirector = ({
                 label="Department"
                 onChange={handleDepartmentChange}
               >
-                {departments?.map((val) => {
-                  return (
-                    <MenuItem key={val._id + val.name + IDX} value={val}>
-                      {val.name.toUpperCase()}
-                    </MenuItem>
-                  );
-                })}
+                {departments?.map((val) => (
+                  <MenuItem key={val._id} value={val}>
+                    {val.name.toUpperCase()}
+                  </MenuItem>
+                ))}
               </Select>
             </FormControl>
             <Typography
@@ -204,10 +208,9 @@ const AddDirector = ({
               component="div"
               sx={{ my: 2, display: "flex" }}
             >
-              {manageList.map((val, i) => (
+              {manageList.map((val) => (
                 <Typography
-                  varaint="small"
-                  key={val + i}
+                  key={val._id}
                   onClick={() => removeManageDepartment(val)}
                   component="small"
                   sx={{
@@ -229,7 +232,6 @@ const AddDirector = ({
               ))}
             </Typography>
             <br />
-
             <Button
               type="submit"
               size="large"

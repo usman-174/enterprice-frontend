@@ -18,7 +18,7 @@ const style = {
   p: 4,
 };
 
-const AddDepartment = ({ fetchDepartments, directions }) => {
+const AddDepartment = ({ fetchDepartments, directions ,disabled}) => {
   const [open, setOpen] = React.useState(false);
   const [title, setTitle] = React.useState("");
   const [direction, setDirection] = React.useState("");
@@ -56,6 +56,7 @@ const AddDepartment = ({ fetchDepartments, directions }) => {
       <Button
         variant="contained"
         onClick={handleOpen}
+        disabled={disabled}
         sx={{ margin: { md: "20px 60px" } }}
       >
         Add Department

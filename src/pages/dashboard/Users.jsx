@@ -1,13 +1,13 @@
 import {
-  Box, TableContainer,
+  Box,
+  TableContainer,
   TablePagination,
-  TextField
+  TextField,
 } from "@mui/material";
 import axios from "axios";
 import { useEffect, useState } from "react";
 
 import Table from "@mui/material/Table";
-
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
 import TableHead from "@mui/material/TableHead";
@@ -34,14 +34,13 @@ const Users = () => {
   const handleLimitChange = (event) => {
     setLimit(event.target.value);
   };
+
   const fetchUsers = async () => {
     try {
       setLoading(true);
       const { data } = await axios.get("auth/all");
-
       if (data?.users) {
-        const res = data?.users.filter((user) => user.role !== "director")
-
+        const res = data?.users.filter((user) => user?.role !== "director");
         setUsers(res);
       }
       setLoading(false);
@@ -56,6 +55,7 @@ const Users = () => {
       setLoading(false);
     }
   };
+
   const fetchDepartments = async () => {
     try {
       const { data } = await axios.get("departments");
@@ -66,6 +66,7 @@ const Users = () => {
       return;
     }
   };
+
   const handleDeleteUser = async (id) => {
     try {
       const { data } = await axios.delete("auth/" + id);
@@ -74,7 +75,7 @@ const Users = () => {
       }
     } catch (error) {
       toast.error(
-        error?.response.data.message || "Failed to Delete the User",
+        error?.response?.data?.message || "Failed to Delete the User",
         {
           position: "top-right",
           autoClose: 2000,
@@ -85,14 +86,31 @@ const Users = () => {
       );
     }
   };
+
   useEffect(() => {
     fetchUsers();
     fetchDepartments();
-    // eslint-disable-next-line
   }, []);
+
   if (loading && !users.length) {
     return <img src={logo} alt="loading" className="loader" />;
   }
+
+  const filteredUsers = users.filter((user) => {
+    const query = searchQ.trim().toLowerCase();
+    if (
+      query.length === 0 ||
+      user.username?.toLowerCase().includes(query) ||
+      user.email?.toLowerCase().includes(query) ||
+      user.role?.toLowerCase().includes(query) ||
+      (user.department?.name &&
+        user.department?.name?.toLowerCase().includes(query))
+    ) {
+      return true;
+    }
+    return false;
+  });
+
   return (
     <Box sx={{ margin: { md: "50px", xs: "20px" } }}>
       <Box sx={{ margin: "20px auto", textAlign: "center" }}>
@@ -115,7 +133,6 @@ const Users = () => {
           sx={{
             padding: "10px",
             margin: "auto",
-
             textAlign: "center",
           }}
         >
@@ -125,7 +142,6 @@ const Users = () => {
               <TableCell sx={{ fontWeight: "bold" }}>Username</TableCell>
               <TableCell sx={{ fontWeight: "bold" }}>Role</TableCell>
               <TableCell sx={{ fontWeight: "bold" }}>Status</TableCell>
-
               <TableCell sx={{ fontWeight: "bold" }}>Department</TableCell>
               <TableCell sx={{ fontWeight: "bold", textAlign: "center" }}>
                 Action
@@ -133,34 +149,17 @@ const Users = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {users
-              .slice(0, limit)
-              .filter((val) => {
-                const query = searchQ.trim().toLowerCase();
-                let returnValue = false;
-
-                if (query.length === "") {
-                  returnValue = false;
-                } else if (
-                  val.username.toLowerCase().includes(query) ||
-                  val.email.toLowerCase().includes(query) ||
-                  val.role.toLowerCase().includes(query) ||
-                  val.department.name.toLowerCase().includes(query)
-                ) {
-                  returnValue = true;
-                }
-                return returnValue;
-              })
+            {filteredUsers
+              .slice(currentPage * limit, currentPage * limit + limit)
               .map((row) => (
                 <TableRow key={row._id}>
                   <TableCell>{row.email}</TableCell>
                   <TableCell>{row.username}</TableCell>
-                  <TableCell>{row.role.toUpperCase()}</TableCell>
+                  <TableCell>{row.role?.toUpperCase()}</TableCell>
                   <TableCell>{row?.seeOnly ? "Read Only" : "Read/Write"}</TableCell>
-                  
-                  <TableCell>{row.department?.name ? row.department?.name: "N/A"}</TableCell>
+                  <TableCell>{row.department?.name || "N/A"}</TableCell>
                   <TableCell sx={{ textAlign: "center" }}>
-                  <AlertDialog  handleDelete={handleDeleteUser} id={row._id} />
+                    <AlertDialog handleDelete={handleDeleteUser} id={row._id} />
                     <UpdateUser
                       loading={loading}
                       departmentList={departmentList}
@@ -173,11 +172,10 @@ const Users = () => {
           </TableBody>
         </Table>
       </TableContainer>
-
       <TablePagination
         component="div"
         sx={{ marginRight: "40px" }}
-        count={users?.length}
+        count={filteredUsers.length}
         onPageChange={handlePagination}
         onRowsPerPageChange={handleLimitChange}
         page={currentPage}

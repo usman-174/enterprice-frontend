@@ -13,14 +13,14 @@ import Button from "@mui/material/Button";
 import Modal from "@mui/material/Modal";
 import TextField from "@mui/material/TextField";
 import axios from "axios";
-import React from "react";
+import React, { useState } from "react";
+
 const style = {
   position: "absolute",
   top: "50%",
   left: "50%",
   transform: "translate(-50%, -50%)",
   width: { md: "35%", xs: "90%" },
-
   borderRadius: 2,
   bgcolor: "background.paper",
   border: "1px solid crimson",
@@ -29,43 +29,48 @@ const style = {
 };
 
 const AddUser = ({ departmentList, fetchUsers }) => {
-  const [open, setOpen] = React.useState(false);
-  const [email, setEmail] = React.useState("");
+  const [open, setOpen] = useState(false);
+  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
+  const [role, setRole] = useState("");
+  const [error, setError] = useState("");
+  const [selectedDepartment, setSelectedDepartment] = useState("");
+  const [department, setDepartment] = useState("");
+  const [checked, setChecked] = useState(false);
 
-  const [username, setUsername] = React.useState("");
-
-  const [role, setRole] = React.useState("");
-  const [error, setError] = React.useState("");
-  const [selectedDepartment, setSelectedDepartment] = React.useState("");
-  const [department, setDepartment] = React.useState("");
   const handleDepartmentChange = (e, v) => {
-    if (v?.length) {
-      setSelectedDepartment(v);
-      const result = departmentList.find((x) => x.name === v);
-      if (result) {
-        setDepartment(result._id);
-      }else{
-        setError("Invalid Department")
-      }
+    setSelectedDepartment(v);
+    const result = departmentList.find((x) => x.name === v);
+    if (result) {
+      setDepartment(result._id);
+      setError("");
+    } else {
+      setDepartment("");
+      setError("Invalid Department");
     }
   };
-  const [checked, setChecked] = React.useState(false);
+
   const handleChange = (event) => {
     setChecked(event.target.checked);
   };
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
-  const handleSubmit = async (e) => {
-    setError("");
-    e.preventDefault();
-    if (!email || !role) {
-      return setError("Please provide all details");
-    }
-    if(role !=="admin"&&!department){
-      return setError("Please select a valid Department");
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+
+    if (!email || !role) {
+      setError("Please provide email and role.");
+      return;
     }
+
+    if (role !== "admin" && !department) {
+      setError("Please select a valid department for user role.");
+      return;
+    }
+
     try {
       const { data } = await axios.post("auth/register", {
         email,
@@ -76,14 +81,21 @@ const AddUser = ({ departmentList, fetchUsers }) => {
       });
       if (data?.success) {
         fetchUsers();
-        e.target.reset()
-        return handleClose();
+        setEmail("");
+        setUsername("");
+        setRole("");
+        setDepartment("");
+        setChecked(false);
+        setError("");
+        handleClose();
       }
     } catch (error) {
-      return setError(error?.response?.data?.message||"Error while adding the User.");
-
+      setError(
+        error?.response?.data?.message || "Error while adding the User."
+      );
     }
   };
+
   return (
     <Box sx={{ position: "relative" }}>
       <Button
@@ -112,12 +124,7 @@ const AddUser = ({ departmentList, fetchUsers }) => {
               * {error}
             </FormHelperText>
           )}
-          <Box
-            component="form"
-            onSubmit={handleSubmit}
-            noValidate
-            sx={{ mt: 1 }}
-          >
+          <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
             <TextField
               margin="normal"
               required
@@ -142,7 +149,7 @@ const AddUser = ({ departmentList, fetchUsers }) => {
               autoComplete="username"
               autoFocus
             />
-             <FormControl sx={{ width: "60%", mt: 2 }}>
+            <FormControl sx={{ width: "60%", mt: 2 }}>
               <InputLabel id="Role-id">Role</InputLabel>
               <Select
                 labelId="Role-id"
@@ -157,30 +164,34 @@ const AddUser = ({ departmentList, fetchUsers }) => {
                 <MenuItem value="user">User</MenuItem>
               </Select>
             </FormControl>
-            {role === "user"?<FormControl sx={{ width: "60%", mt: 2 }}>
-              <Autocomplete
-                id="departments"
-                fullWidth
-                value={selectedDepartment}
-                onChange={handleDepartmentChange}
-                options={departmentList?.map((dept) => dept?.name)}
-                renderInput={(params) => (
-                  <TextField {...params} label="Select Department" />
-                )}
-              />
-            </FormControl>:null}       
-           {role ==="user" ?<Box sx={{ mx: 1 }}>
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={checked}
-                    onChange={handleChange}
-                    inputProps={{ "aria-label": "controlled" }}
-                  />
-                }
-                label="View Only"
-              />
-            </Box>:null}
+            {role === "user" ? (
+              <FormControl sx={{ width: "60%", mt: 2 }}>
+                <Autocomplete
+                  id="departments"
+                  fullWidth
+                  value={selectedDepartment}
+                  onChange={handleDepartmentChange}
+                  options={departmentList?.map((dept) => dept?.name)}
+                  renderInput={(params) => (
+                    <TextField {...params} label="Select Department" />
+                  )}
+                />
+              </FormControl>
+            ) : null}
+            {role === "user" ? (
+              <Box sx={{ mx: 1 }}>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={checked}
+                      onChange={handleChange}
+                      inputProps={{ "aria-label": "controlled" }}
+                    />
+                  }
+                  label="View Only"
+                />
+              </Box>
+            ) : null}
             <br />
             <Button
               type="submit"

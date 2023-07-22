@@ -33,8 +33,8 @@ const Suppliers = () => {
       setLoading(true);
       const { data } = await axios.get("suppliers");
 
-      if (data?.suppliers) {
-        setSuppliers(data?.suppliers);
+      if (data?.data) {
+        setSuppliers(data?.data);
       }
       setLoading(false);
     } catch (error) {
