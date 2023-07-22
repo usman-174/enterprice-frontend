@@ -3,7 +3,7 @@ import ReactDOM from "react-dom/client";
 
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
-console.log({mode:process.env.NODE_ENV,api:process.env.API });
+console.log({mode:process.env.NODE_ENV,api:process.env.REACT_APP_API });
  
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(

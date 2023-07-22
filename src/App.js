@@ -38,7 +38,7 @@ function App() {
         if (window.location.pathname.includes("login")) {
           // Use axios if URL contains "login" string
           response = await axios.get(
-            process.env.API + "/auth/getUser" ||
+            process.env.REACT_APP_API + "/auth/getUser" ||
               "https://enterprice-app-backend-production.up.railway.app/api/auth/getUser",
             { withCredentials: true }
           );
