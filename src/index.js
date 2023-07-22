@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import axios from "axios";
+
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 console.log({mode:process.env.NODE_ENV,api:process.env.API });
