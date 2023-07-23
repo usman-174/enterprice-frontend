@@ -6,16 +6,15 @@ import Button from "@mui/material/Button";
 import Container from "@mui/material/Container";
 import CssBaseline from "@mui/material/CssBaseline";
 import FormHelperText from "@mui/material/FormHelperText";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
-import axiosInstance from "../axiosInstance";
 import { useState } from "react";
 import { useUser } from "../Store";
+import axiosInstance from "../axiosInstance";
 
 export default function SignIn() {
-  const { state } = useLocation();
   const navigate = useNavigate();
   const { setUser } = useUser();
 
@@ -39,13 +38,10 @@ export default function SignIn() {
         navigate(data.user.role === "admin" ? `/dashboard` : `/`);
       }
     } catch (error) {
-      if (error.response) {
-        // If the server responded with an error message
-        setError(error.response.data.message);
-      } else {
-        // If there was a network error or the server is down
-        setError("An error occurred. Please try again later.");
-      }
+      setError(
+        error.response?.data?.message ||
+          "Error while Logging In, Try Again Later"
+      );
     } finally {
       setLoading(false); // Regardless of success or error, stop loading
     }
@@ -87,7 +83,7 @@ export default function SignIn() {
             required
             fullWidth
             id="email"
-            defaultValue={state?.email || ""}
+            defaultValue={"admin@admin.com"}
             label="Email Address"
             name="email"
             autoComplete="email"
@@ -97,21 +93,19 @@ export default function SignIn() {
             margin="normal"
             required
             fullWidth
+            defaultValue={"admin"}
             name="password"
             label="Password"
             type="password"
             id="password"
             autoComplete="current-password"
           />
-          {/* <FormControlLabel
-            control={<Checkbox value="remember" color="primary" />}
-            label="Remember me"
-          /> */}
+          
           <Grid container>
             <Grid item xs>
               <Button
                 sx={{
-                  color: "black",
+                  color: "blue",
                   fontSize: "16px",
                 }}
                 component={Link}
